@@ -1,0 +1,28 @@
+spring:
+  #  database config
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/oidc?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong
+    username: root
+    password: root
+
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    com.hust.mapper: debug
+
+server:
+  tomcat:
+    basedir: logs
+    accesslog:
+      pattern: '%t %m %s %v %U'
+      enabled: true
+      directory: access-logs
+      buffered: false
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
