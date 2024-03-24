@@ -11,8 +11,8 @@ public class Constants {
     public static final String MAIL_SMTP_SSL_ENABLE = "mail.smtp.ssl.enable";
     public static final String MAIL_SMTP_SSL_SOCKET_FACTORY = "mail.smtp.ssl.socketFactory";
     public static final String SMTP_SERVER = "smtp.qq.com";
-    public static final String EMAIL_ADDRESS = "421634412@qq.com";
-    public static final String EMAIL_PASSWORD = "nrehvwwpqeqsbjbg";
+    public static final String EMAIL_ADDRESS = "";
+    public static final String EMAIL_PASSWORD = "";
     public static final String INVALID_DATA_ERROR_MESSAGE = "数据不符合要求，请重新输入";
     public static final String CREATE_SUCCESS_MESSAGE = "创建用户成功！";
     public static final String CREATE_FAILURE_MESSAGE = "创建用户失败！";
