@@ -5,7 +5,17 @@ spring:
     url: jdbc:mysql://localhost:3306/oidc?useUnicode=true&characterEncoding=utf8&serverTimezone=Hongkong
     username: root
     password: root
-
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 421634412@qq.com
+    password: nrehvwwpqeqsbjbg
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
+          smtp.ssl.enable: true
   jpa:
     show-sql: true
 
@@ -21,6 +31,8 @@ server:
       enabled: true
       directory: access-logs
       buffered: false
+  servlet:
+    context-path: /
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
