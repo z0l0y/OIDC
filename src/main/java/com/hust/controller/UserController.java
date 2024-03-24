@@ -36,4 +36,10 @@ public class UserController {
             return Result.error(CREATE_FAILURE_MESSAGE);
         }
     }
+
+    @PostMapping("/update")
+    public Result updateUserInfo(@RequestBody UserDTO userDTO) {
+        return Result.success();
+    }
+
 }

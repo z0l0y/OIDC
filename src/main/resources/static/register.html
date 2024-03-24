@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <title>bangumi注册界面</title>
     <style>
+        input::placeholder {
+            color: #999; /* 设置文本颜色为灰色 */
+            font-style: italic; /* 设置文本为斜体 */
+            font-size: 13px; /* 设置文本字体大小为 13 像素 */
+            font-weight: bold; /* 设置文本为粗体 */
+            padding: 5px; /* 设置内边距为 5 像素 */
+            text-align: center; /* 设置文本居中对齐 */
+        }
+
+        textarea::placeholder {
+            color: #999; /* 设置文本颜色为灰色 */
+            font-style: italic; /* 设置文本为斜体 */
+            font-size: 14px; /* 设置文本字体大小为 14 像素 */
+            font-weight: bold; /* 设置文本为粗体 */
+            padding: 5px; /* 设置内边距为 5 像素 */
+            text-align: center; /* 设置文本居中对齐 */
+        }
+
         h1 {
             text-align: center;
         }
@@ -25,75 +43,78 @@
 </head>
 <body>
 <h1>bangumi用户信息注册</h1>
-<form>
+<div style="padding: 5px 0; font-weight: bold;display: flex; justify-content: center; align-items: center;">
+    <label for="username">请输入您的用户名:</label>
+</div>
+<div style="display: flex; justify-content: center; align-items: center;">
+    <input type="text"
+           placeholder="Username must be between 1 and 16 characters"
+           style="outline: none; border: none;border-radius: 20px; width: 300px;height:30px;padding: 5px 10px"
+           id="username" required><br>
+</div>
+<div style="padding: 5px 0; font-weight: bold;display: flex; justify-content: center; align-items: center;">
+    <label for="nickname">请输入您的昵称:</label>
+</div>
+<div style="display: flex; justify-content: center; align-items: center;">
+    <input type="text"
+           placeholder="Nickname must be between 1 and 16 characters"
+           style="outline: none; border: none;border-radius: 20px; width: 300px;height:30px;padding: 5px 10px"
+           id="nickname" required><br>
+</div>
+<div id="verify">
     <div style="padding: 5px 0; font-weight: bold;display: flex; justify-content: center; align-items: center;">
-        <label for="username">请输入您的用户名:</label>
+        <label for="password">请输入您的密码:</label>
     </div>
-    <div style="display: flex; justify-content: center; align-items: center;">
-        <input type="text"
+    <div @mouseenter="name" style="display: flex; justify-content: center; align-items: center;">
+        <input type="password" v-model="password1"
+               placeholder="Password must be at least 8 characters"
                style="outline: none; border: none;border-radius: 20px; width: 300px;height:30px;padding: 5px 10px"
-               id="username" required><br>
+               id="password" required><br>
     </div>
     <div style="padding: 5px 0; font-weight: bold;display: flex; justify-content: center; align-items: center;">
-        <label for="nickname">请输入您的昵称:</label>
+        <label for="email">请输入您的邮箱:</label>
     </div>
-    <div style="display: flex; justify-content: center; align-items: center;">
-        <input type="text"
-               style="outline: none; border: none;border-radius: 20px; width: 300px;height:30px;padding: 5px 10px"
-               id="nickname" required><br>
+    <div @mouseenter="examine" style="display: flex; justify-content: center; align-items: center;">
+        <input type="email"
+               placeholder="Email cannot be blank"
+               style="outline: none;border-radius: 20px; border: none;width: 300px;height:30px;padding: 5px 10px"
+               id="email" required><br>
     </div>
-    <div id="verify">
-        <div style="padding: 5px 0; font-weight: bold;display: flex; justify-content: center; align-items: center;">
-            <label for="password">请输入您的密码:</label>
-        </div>
-        <div @mouseenter="name" style="display: flex; justify-content: center; align-items: center;">
-            <input type="password" v-model="password1"
-                   style="outline: none; border: none;border-radius: 20px; width: 300px;height:30px;padding: 5px 10px"
-                   id="password" required><br>
-        </div>
-        <div style="padding: 5px 0; font-weight: bold;display: flex; justify-content: center; align-items: center;">
-            <label for="email">请输入您的邮箱:</label>
-        </div>
-        <div @mouseenter="examine" style="display: flex; justify-content: center; align-items: center;">
-            <input type="email"
-                   style="outline: none;border-radius: 20px; border: none;width: 300px;height:30px;padding: 5px 10px"
-                   id="email" required><br>
-            <span id="error-message"></span>
-        </div>
 
-        <div style="padding: 5px 0; font-weight: bold;display: flex; justify-content: center; align-items: center;">
-            <label for="avatar">您的头像：</label>
-        </div>
-        <div style="display: flex; justify-content: center; align-items: center;">
-            <label>
-                <input id="avatar" type="file" accept="image/*" v-model="password2" required
-                       style="outline: none; border: none;border-radius: 20px; width: 300px;height:30px;padding: 5px 10px">
-            </label><br>
-        </div>
-        <div style="padding: 5px 0; font-weight: bold;display: flex; justify-content: center; align-items: center;">
-            <label for="bio">简单介绍一下自己吧：</label>
-        </div>
-        <div style="display: flex; justify-content: center; align-items: center;">
-            <label>
-                <textarea id="bio" type="password" v-model="password2" required
+    <div style="padding: 5px 0; font-weight: bold;display: flex; justify-content: center; align-items: center;">
+        <label for="avatar">您的头像：</label>
+    </div>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <label>
+            <input id="avatar" type="file" accept="image/*" v-model="password2" required
+                   style="outline: none; border: none;border-radius: 20px; width: 300px;height:30px;padding: 5px 10px">
+        </label><br>
+    </div>
+    <div style="padding: 5px 0; font-weight: bold;display: flex; justify-content: center; align-items: center;">
+        <label for="bio">简单介绍一下自己吧：</label>
+    </div>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <label>
+                <textarea id="bio"
+                          placeholder="Bio must not exceed 64 characters"
+                          type="password" v-model="password2" required
                           style="outline: none; border: none;border-radius: 20px; width: 300px;height:30px;padding: 5px 10px"></textarea>
-            </label><br>
-        </div>
-
-        <div style="display: flex; justify-content: center; align-items: center;">
-            <strong>小tips：为了能更快的注册成功，您的邮箱不要写</strong>
-        </div>
-        <div style="display: flex; justify-content: center; align-items: center;">
-            <strong>错，要不然是注册不了的哦</strong>
-        </div>
-        <!-- 注册按钮 -->
-        <div style="display: flex; justify-content: center; align-items: center;">
-            <button id="registerButton"
-                    style="border-radius: 20px; width: 150px; padding: 5px 5px;font-size: large;color: black;">注册
-            </button>
-        </div>
+        </label><br>
     </div>
-</form>
+
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <strong>小tips：为了能更快的注册成功，您的邮箱不要写</strong>
+    </div>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <strong>错，要不然是注册不了的哦</strong>
+    </div>
+    <!-- 注册按钮 -->
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <button id="registerButton"
+                style="border-radius: 20px; width: 150px; padding: 5px 5px;font-size: large;color: black;">注册
+        </button>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
 <script>
     new Vue({
@@ -106,22 +127,22 @@
 
     document.getElementById("registerButton").addEventListener("click", function () {
         // 获取用户输入的注册信息
-        var username = document.getElementById("username").value;
-        var password = document.getElementById("password").value;
-        var email = document.getElementById("email").value;
-        var nickname = document.getElementById("nickname").value;
-        var avatar = document.getElementById("avatar").value;
-        var bio = document.getElementById("bio").value;
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const email = document.getElementById("email").value;
+        const nickname = document.getElementById("nickname").value;
+        const avatar = document.getElementById("avatar").value;
+        const bio = document.getElementById("bio").value;
         if (email === "") {
             return;
         }
-        var emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9]{2,6}$/;
+        const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9]{2,6}$/;
         if (!emailRegex.test(email)) {
-            document.getElementById("error-message").textContent = "您的邮箱地址格式不正确，请重新输入";
-            document.getElementById("email-input").value = ""; // 清空输入框的值
+            alert("您的邮箱地址格式不正确，请重新输入");
+            return;
         }
         // 创建一个XMLHttpRequest对象
-        var xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
 
         // 设置请求方法和URL
         xhr.open("POST", "http://localhost:8080/user/register", true);
@@ -130,7 +151,7 @@
         xhr.setRequestHeader("Content-type", "application/json");
 
         // 设置请求体，包含用户注册信息
-        var requestBody = JSON.stringify({
+        const requestBody = JSON.stringify({
             "username": username,
             "password": password,
             "email": email,

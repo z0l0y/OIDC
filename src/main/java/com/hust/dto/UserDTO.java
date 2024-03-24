@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Data
 public class UserDTO {
     @NotBlank(message = "Username cannot be blank")
-    @Size(min = 4, max = 16, message = "Username must be between 4 and 16 characters")
+    @Size(min = 1, max = 16, message = "Username must be between 1 and 16 characters")
     private String username;
 
     @NotBlank(message = "Password cannot be blank")
@@ -25,7 +25,7 @@ public class UserDTO {
     private String email;
 
     @NotBlank(message = "Nickname cannot be blank")
-    @Size(max = 16, message = "Nickname must not exceed 16 characters")
+    @Size(min = 1, max = 16, message = "Nickname must be between 1 and 16 characters")
     private String nickname;
 
     @URL(message = "Invalid avatar URL")
