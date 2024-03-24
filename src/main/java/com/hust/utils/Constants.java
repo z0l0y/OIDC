@@ -16,4 +16,5 @@ public class Constants {
     public static final String INVALID_DATA_ERROR_MESSAGE = "数据不符合要求，请重新输入";
     public static final String CREATE_SUCCESS_MESSAGE = "创建用户成功！";
     public static final String CREATE_FAILURE_MESSAGE = "创建用户失败！";
+    public static final String LOGIN_FAILURE = "登录失败！";
 }
