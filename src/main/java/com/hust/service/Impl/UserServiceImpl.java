@@ -63,15 +63,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result loginBangumi(UserDTO userDTO) {
-        // 进入业务逻辑之前一定要对我们的数据进行检测，不要污染了数据库
-        if (userValidator.UserInfoValidator(userDTO).getCode() == 0) {
-            return Result.error(INVALID_DATA_ERROR_MESSAGE);
-        }
         UserPO userPO = toUserPO(userDTO);
-        if (userMapper.getUser(userPO) == null) {
+        UserPO user = userMapper.getUser(userPO);
+        if (user == null) {
             return Result.error();
         }else{
-            UserVO userVO = toUserVO(userPO);
+            UserVO userVO = toUserVO(user);
             return Result.success(userVO);
         }
     }

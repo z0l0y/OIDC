@@ -34,10 +34,10 @@ public class Conversion {
 
     public static UserVO toUserVO(UserPO userPO) {
         UserVO userVO = new UserVO();
-        userPO.setUsername(userPO.getUsername());
-        userPO.setNickname(userPO.getNickname());
-        userPO.setNickname(userPO.getAvatar());
-        userPO.setNickname(userPO.getBio());
+        userVO.setUsername(userPO.getUsername());
+        userVO.setNickname(userPO.getNickname());
+        userVO.setAvatar(userPO.getAvatar());
+        userVO.setBio(userPO.getBio());
         return userVO;
     }
 }

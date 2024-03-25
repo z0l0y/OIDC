@@ -100,8 +100,6 @@ class OIDCApplicationTests {
         userDTO.setPassword(password);
         userDTO.setEmail(email);
         userDTO.setNickname(nickname);
-        userDTO.setAvatar(avatar);
-        userDTO.setBio(bio);
         return userDTO;
     }
 }

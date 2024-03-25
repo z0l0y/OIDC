@@ -17,7 +17,12 @@ public interface UserMapper {
             "values (#{username}, #{password}, #{email}, #{nickname})")
     int createUser(UserPO userPO);
 
-    @Select("select username, email, nickname, avatar, bio from oidc.user_info " +
+    /**
+     *
+     * @param userPO 用户传输对象，包含用户基本信息
+     * @return 获取用户的信息
+     */
+    @Select("select * from oidc.user_info " +
             "where username = #{username} and password = #{password}")
     UserPO getUser(UserPO userPO);
 }

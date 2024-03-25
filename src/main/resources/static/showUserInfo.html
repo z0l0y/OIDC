@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Info</title>
+</head>
+<body>
+<h1>User Information</h1>
+<div id="user-info"></div>
+<input type="text" id="usernameInput" placeholder="Username">
+<input type="password" id="passwordInput" placeholder="Password">
+<button onclick="fetchUserInfo()">Fetch User Info</button>
+
+<script>
+    function fetchUserInfo() {
+        // 获取用户输入的值
+        const username = document.getElementById('usernameInput').value;
+        const password = document.getElementById('passwordInput').value;
+
+        // 构造请求的数据对象
+        const requestData = {
+            username: username,
+            password: password
+        };
+
+        fetch('http://localhost:8080/user/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        })
+            // 将从后端获取到的数据转换为JSON格式的字符串
+            .then(response => response.json())
+            .then(data => {
+                // 更新 HTML 页面显示用户信息
+                const userInfoDiv = document.getElementById('user-info');
+                // 获取到我们的JSON数据，然后从里面获取到一些信息，显示到页面上
+                userInfoDiv.innerHTML = `
+            <p>Username: ${data.data.username}</p>
+            <p>Nickname: ${data.data.nickname}</p>
+            <p>Avatar: ${data.data.avatar}</p>
+            <p>Bio: ${data.data.bio}</p>
+          `;
+            })
+            .catch(error => {
+                console.error('Failed to fetch user information:', error);
+            });
+    }
+</script>
+</body>
+</html>
