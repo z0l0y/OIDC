@@ -1,6 +1,7 @@
 package com.hust.dto;
 
 import lombok.Data;
+import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -23,6 +24,9 @@ public class UserDTO {
     @NotBlank(message = "Nickname cannot be blank")
     @Size(min = 1, max = 16, message = "Nickname must be between 1 and 16 characters")
     private String nickname;
+
+    @URL(message = "Invalid avatar URL")
+    private String avatar;
 
     @Size(max = 64, message = "Bio must not exceed 64 characters")
     private String bio;

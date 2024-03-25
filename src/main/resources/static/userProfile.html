@@ -164,14 +164,15 @@
         <div class="upload-text">
             不喜欢现在的头像？点击下面的按钮，挑选你喜欢的图片上传吧
         </div>
-        <form class="upload-form" action="http://localhost:8080/user/upImg" method="post" enctype="multipart/form-data">
+        <form class="upload-form">
             <div class="upload-input-wrapper">
                 <label class="upload-label" for="avatar-upload">选择图片：</label>
                 <input class="upload-input" type="file" id="avatar-upload" name="file" onchange="enableUploadButton()"
                        required>
             </div>
             <div class="upload-button-wrapper">
-                <button class="upload-custom-button" onclick="document.getElementById('avatar-upload').click()">选择图片
+                <button class="upload-custom-button" type="button"
+                        onclick="document.getElementById('avatar-upload').click()">选择图片
                 </button>
                 <input class="upload-submit" type="submit" value="上传" disabled>
             </div>
@@ -214,6 +215,56 @@
             uploadButton.disabled = true;
         }
     }
+
+    // 获取上传表单和上传按钮的HTML元素
+    const uploadForm = document.querySelector('.upload-form');
+    const uploadButton = document.querySelector('.upload-submit');
+
+    // 监听上传表单的提交事件
+    uploadForm.addEventListener('submit', function (event) {
+        event.preventDefault(); // 防止表单默认提交行为
+
+        // 创建 FormData 对象，用于构建表单数据
+        const formData = new FormData(uploadForm);
+
+        // 发送上传请求
+        fetch('http://localhost:8080/user/upImg', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.text()) // 解析服务器的文本数据
+            .then(data => {
+                let jsonData;
+                try {
+                    jsonData = JSON.stringify(data); // 尝试解析为 JSON 对象
+                } catch (error) {
+                    console.error('无法解析响应数据为 JSON:', error);
+                    return;
+                }
+                // 上传成功后，获取返回的文件URL并更新用户头像
+                const cleanAvatar = jsonData.substring(1, jsonData.length - 1);
+                const avatar = cleanAvatar.toString();
+                avatarElement.src = avatar;
+                const updateData = {
+                    "avatar": avatar,
+                    "username": username
+                }; // 创建包含文件URL和用户名的更新数据对象
+                fetch('http://localhost:8080/user/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData) // 将更新数据对象转换为 JSON 字符串
+                })
+                    .then(response => response.json())
+                    .catch(error => {
+                        console.error('更新数据失败:', error);
+                    });
+            })
+            .catch(error => {
+                console.error('上传失败:', error);
+            });
+    });
 
     function logout() {
         // 发起注销请求

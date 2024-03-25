@@ -14,6 +14,9 @@
             <if test="bio != ''">
                 , bio = #{bio}
             </if>
+            <if test="avatar != ''">
+                , avatar = #{avatar}
+            </if>
         </trim>
         where username = #{username}
     </update>

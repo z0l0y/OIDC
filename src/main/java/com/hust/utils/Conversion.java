@@ -25,11 +25,18 @@ public class Conversion {
         if (userDTO.getBio() == null) {
             userDTO.setBio("");
         }
+        if (userDTO.getNickname() == null) {
+            userDTO.setNickname("");
+        }
+        if (userDTO.getAvatar() == null) {
+            userDTO.setAvatar("");
+        }
         userPO.setUsername(userDTO.getUsername());
         userPO.setPassword(userDTO.getPassword());
         userPO.setEmail(userDTO.getEmail());
         userPO.setNickname(userDTO.getNickname());
         userPO.setBio(userDTO.getBio());
+        userPO.setAvatar(userDTO.getAvatar());
         return userPO;
     }
 
