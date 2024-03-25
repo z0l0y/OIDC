@@ -1,22 +1,168 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>User Info</title>
+    <title>Login bangumi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f6f8fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #24292e;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+
+        .profile-info {
+            margin-left: 20px;
+        }
+
+        .profile-info h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .profile-info p {
+            margin: 5px 0;
+            color: #586069;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        /*        .button {
+                    padding: 10px 20px;
+                    font-size: 14px;
+                    background-color: #0366d6;
+                    color: #fff;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                }*/
+
+        .button:hover {
+            background-color: #005cc5;
+        }
+
+        .register-button {
+            background-color: #0366d6;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .register-button:hover {
+            background-color: #005cc5;
+        }
+
+        .register-text {
+            margin-top: 10px;
+            color: #586069;
+            font-size: 12px;
+        }
+
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+    </style>
 </head>
 <body>
-<h1>User Information</h1>
-<div id="user-info"></div>
-<input type="text" id="usernameInput" placeholder="Username">
-<input type="password" id="passwordInput" placeholder="Password">
-<button onclick="fetchUserInfo()">Fetch User Info</button>
+<div class="header">
+    <h1>Login bangumi</h1>
+</div>
+
+<div class="container">
+    <div class="profile">
+        <img class="profile-image" src="./img/bangumi.png" alt="Profile Image">
+        <div class="profile-info">
+            <h1>HUST OIDC</h1>
+            <p>Location: HUST</p>
+            <p>Email: hust@hust.edu.cn</p>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="usernameInput">Username:</label>
+        <input type="text" id="usernameInput" placeholder="Username">
+    </div>
+    <div class="form-group">
+        <label for="passwordInput">Password:</label>
+        <input type="password" id="passwordInput" placeholder="Password">
+    </div>
+    <button class="button" onclick="fetchUserInfo()">Login</button>
+
+    <div id="user-info"></div>
+    <!-- 注册按钮和提示文本 -->
+    <div>
+        <button class="register-button" onclick="redirectToRegister()">Register</button>
+        <p class="register-text">Don't have an account? Please register first.</p>
+    </div>
+</div>
 
 <script>
+    function redirectToRegister() {
+        window.location.href = 'register.html';
+    }
+
     function fetchUserInfo() {
-        // 获取用户输入的值
         const username = document.getElementById('usernameInput').value;
         const password = document.getElementById('passwordInput').value;
 
-        // 构造请求的数据对象
         const requestData = {
             username: username,
             password: password
@@ -29,18 +175,16 @@
             },
             body: JSON.stringify(requestData)
         })
-            // 将从后端获取到的数据转换为JSON格式的字符串
             .then(response => response.json())
             .then(data => {
-                // 更新 HTML 页面显示用户信息
                 const userInfoDiv = document.getElementById('user-info');
-                // 获取到我们的JSON数据，然后从里面获取到一些信息，显示到页面上
                 userInfoDiv.innerHTML = `
-            <p>Username: ${data.data.username}</p>
-            <p>Nickname: ${data.data.nickname}</p>
-            <p>Avatar: ${data.data.avatar}</p>
-            <p>Bio: ${data.data.bio}</p>
-          `;
+                    <h2>User Information</h2>
+                    <p><strong>Username:</strong> ${data.data.username}</p>
+                    <p><strong>Nickname:</strong> ${data.data.nickname}</p>
+                    <p><strong>Avatar:</strong> ${data.data.avatar}</p>
+                    <p><strong>Bio:</strong> ${data.data.bio}</p>
+                `;
             })
             .catch(error => {
                 console.error('Failed to fetch user information:', error);
