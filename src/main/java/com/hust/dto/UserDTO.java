@@ -23,4 +23,7 @@ public class UserDTO {
     @NotBlank(message = "Nickname cannot be blank")
     @Size(min = 1, max = 16, message = "Nickname must be between 1 and 16 characters")
     private String nickname;
+
+    @Size(max = 64, message = "Bio must not exceed 64 characters")
+    private String bio;
 }

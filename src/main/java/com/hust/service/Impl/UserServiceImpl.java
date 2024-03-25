@@ -67,11 +67,21 @@ public class UserServiceImpl implements UserService {
         UserPO user = userMapper.getUser(userPO);
         if (user == null) {
             return Result.error();
-        }else{
+        } else {
             UserVO userVO = toUserVO(user);
             return Result.success(userVO);
         }
     }
 
+    @Override
+    public Result updateUserInfo(UserDTO userDTO) {
+        UserPO userPO = toUserPO(userDTO);
+        int number = userMapper.updateUserInfo(userPO);
+        if (number > 0) {
+            return Result.success();
+        } else {
+            return Result.error();
+        }
+    }
 
 }

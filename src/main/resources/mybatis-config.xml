@@ -1,0 +1,6 @@
+<!-- mybatis-config.xml -->
+<configuration>
+    <mappers>
+        <mapper resource="com/hust/mapper/xml/UserMapper.xml"/>
+    </mappers>
+</configuration>

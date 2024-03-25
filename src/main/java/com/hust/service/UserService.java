@@ -20,4 +20,11 @@ public interface UserService {
      * @return 登录是否成功，true表示登录成功，false表示登录失败
      */
     Result loginBangumi(UserDTO userDTO);
+
+    /**
+     * @param userDTO 传输对象，包含了唯一标识符username和我们要进行修改的nickname（因为要考虑到我们可能有用一个邮箱注册多个账户的人，所以只能选username来作为参照了）
+     * @return 修改用户nickname是否成功
+     */
+    // TODO 我们这里要考虑重名的问题，这样查出来才不会是两个用户
+    Result updateUserInfo(UserDTO userDTO);
 }

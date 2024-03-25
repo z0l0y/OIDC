@@ -230,23 +230,20 @@
                 if (response.ok) {
                     // 注销成功，执行相应操作
                     alert('Logout successful');
-                    // TODO: 执行其他注销后的操作
                 } else {
                     // 注销失败，显示错误信息
                     alert('Logout failed');
-                    // TODO: 处理注销失败的情况
                 }
             })
             .catch(error => {
                 // 处理错误
                 console.error('Logout error:', error);
-                // TODO: 处理错误情况
             });
     }
 
     function editProfile() {
         // 发起编辑请求
-        fetch('/edit-profile', {
+        fetch('http://localhost:8080/user/update', {
             method: 'POST',
             // 可选：如果需要传递数据到后端，可以在此处设置请求的body
             // body: JSON.stringify({}),
@@ -259,17 +256,14 @@
                 if (response.ok) {
                     // 编辑成功，执行相应操作
                     alert('Edit Profile successful');
-                    // TODO: 执行其他编辑后的操作
                 } else {
                     // 编辑失败，显示错误信息
                     alert('Edit Profilefailed');
-                    // TODO: 处理编辑失败的情况
                 }
             })
             .catch(error => {
                 // 处理错误
                 console.error('Edit Profile error:', error);
-                // TODO: 处理错误情况
             });
     }
 </script>

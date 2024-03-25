@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hust.mapper.UserMapper">
+    <!--    使用trim来处理可能多出来的,-->
+    <update id="updateUserInfo">
+        update user_info set
+        <trim prefixOverrides=",">
+            <if test="nickname != ''">
+                , nickname = #{nickname}
+            </if>
+            <if test="bio != ''">
+                , bio = #{bio}
+            </if>
+        </trim>
+        where username = #{username}
+    </update>
+</mapper>

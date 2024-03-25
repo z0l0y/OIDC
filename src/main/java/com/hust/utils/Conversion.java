@@ -22,13 +22,14 @@ public class Conversion {
         if (userDTO.getEmail() == null) {
             userDTO.setEmail("");
         }
-        if (userDTO.getNickname() == null) {
-            userDTO.setNickname("");
+        if (userDTO.getBio() == null) {
+            userDTO.setBio("");
         }
         userPO.setUsername(userDTO.getUsername());
         userPO.setPassword(userDTO.getPassword());
         userPO.setEmail(userDTO.getEmail());
         userPO.setNickname(userDTO.getNickname());
+        userPO.setBio(userDTO.getBio());
         return userPO;
     }
 

@@ -58,10 +58,16 @@ public class UserController {
         return UploadUtil.uploadImage(file);
     }
 
-
+    // TODO 用户可能只改一个信息，比如nickname或者是bio，那么我们这里最好使用动态SQL来实现
     @PostMapping("/update")
     public Result updateUserInfo(@RequestBody UserDTO userDTO) {
-        return Result.success();
+        // 首先我们要考虑，有什么信息是要update的，一般就是nickname和bio
+        Result updateResult = userService.updateUserInfo(userDTO);
+        if (updateResult.getCode() == 1) {
+            return Result.success("修改信息成功！");
+        } else {
+            return Result.error("修改信息失败！");
+        }
     }
 
 }
