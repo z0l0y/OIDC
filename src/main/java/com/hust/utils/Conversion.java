@@ -1,6 +1,8 @@
 package com.hust.utils;
 
+import com.hust.dto.AppDTO;
 import com.hust.dto.UserDTO;
+import com.hust.po.AppPO;
 import com.hust.po.UserPO;
 import com.hust.vo.UserVO;
 
@@ -38,6 +40,14 @@ public class Conversion {
         userPO.setBio(userDTO.getBio());
         userPO.setAvatar(userDTO.getAvatar());
         return userPO;
+    }
+
+    public static AppPO toAppPO(AppDTO appDTO) {
+        AppPO appPO = new AppPO();
+        appPO.setName(appDTO.getName());
+        appPO.setClientSecret(appDTO.getClientSecret());
+        appPO.setRedirectUrl(appDTO.getRedirectUrl());
+        return appPO;
     }
 
     public static UserVO toUserVO(UserPO userPO) {

@@ -149,7 +149,8 @@
             <img class="avatar" src="./img/OIP.jpg" alt="User Avatar">
             <div class="info">
                 <!-- 写一些提示信息，不要什么提示信息都不显示给用户，只有光秃秃的那几个数据-->
-                <div class="username"><strong>Username:</strong> <span class="placeholder">your username</span></div>
+                <div class="username"><strong>Username:</strong> <span class="placeholder"
+                                                                       id="username">your username</span></div>
                 <div class="nickname"><strong>Nickname:</strong> <span class="placeholder">your nickname</span></div>
                 <div class="bio"><strong>Bio:</strong> <span class="placeholder">your bio</span></div>
             </div>
@@ -185,7 +186,7 @@
 
     // 通过重定向的URL来获取一些不敏感的用户信息，这边获取的都是一些基本的信息，其他用户也可以看的到，所以这边没有进行加密传输
     const urlParams = new URLSearchParams(window.location.search);
-    const username = urlParams.get('username');
+    const username = document.getElementById('username');
     const nickname = urlParams.get('nickname');
     const avatar = urlParams.get('avatar');
     const bio = urlParams.get('bio');
@@ -240,10 +241,35 @@
                 document.querySelector('.nickname').textContent = data.data.nickname;
                 document.querySelector('.bio').textContent = data.data.bio;
                 document.querySelector('.avatar').src = data.data.avatar;
+
+                // 获取 username 的值
+                const username = data.data.username;
+
+                // 构建包含文件URL和用户名的更新数据对象
+                const updateData = {
+                    "avatar": data.data.avatar,
+                    "username": username
+                };
+
+/*                // 发送更新请求
+                fetch('http://localhost:8080/user/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                })
+                    .then(response => response.json())
+                    .then(responseData => {
+                        // 处理响应数据
+                    })
+                    .catch(error => {
+                        console.error('更新数据失败:', error);
+                    });*/
             })
-            .catch(error => {
+           /* .catch(error => {
                 console.error('Error:', error);
-            });
+            });*/
     }
 
     // 页面加载时调用填充字段函数
@@ -271,6 +297,7 @@
         // 创建 FormData 对象，用于构建表单数据
         const formData = new FormData(uploadForm);
 
+
         // 发送上传请求
         fetch('http://localhost:8080/user/upImg', {
             method: 'POST',
@@ -289,26 +316,54 @@
                 const cleanAvatar = jsonData.substring(1, jsonData.length - 1);
                 const avatar = cleanAvatar.toString();
                 avatarElement.src = avatar;
-                const updateData = {
-                    "avatar": avatar,
-                    "username": username
-                }; // 创建包含文件URL和用户名的更新数据对象
-                fetch('http://localhost:8080/user/update', {
-                    method: 'POST',
+
+                var jwtToken = getJwtTokenFromCookie();
+
+                // 发送请求到服务器获取用户个人资料数据
+                // 这里使用示例的fetch函数发送GET请求，您可以根据实际情况选择合适的方式
+                fetch('http://localhost:8080/user/profile', {
                     headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updateData) // 将更新数据对象转换为 JSON 字符串
+                        'Authorization': 'Bearer ' + jwtToken
+                    }
                 })
                     .then(response => response.json())
+                    .then(data => {
+                        // 填充字段
+                        document.querySelector('.username').textContent = data.data.username;
+                        /*document.querySelector('.nickname').textContent = data.data.nickname;
+                        document.querySelector('.bio').textContent = data.data.bio;
+                        document.querySelector('.avatar').src = data.data.avatar;*/
+
+                        // 获取 username 的值
+                        const username = data.data.username;
+
+                        // 构建包含文件URL和用户名的更新数据对象
+                        const updateData = {
+                            "avatar": avatar,
+                            "username": username
+                        };
+
+                        // 发送更新请求
+                        fetch('http://localhost:8080/user/update', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(updateData)
+                        })
+                            .then(response => response.json())
+                            .then(responseData => {
+                                // 处理响应数据
+                            })
+                            .catch(error => {
+                                console.error('更新数据失败:', error);
+                            });
+                    })
                     .catch(error => {
-                        console.error('更新数据失败:', error);
+                        console.error('Error:', error);
                     });
             })
-            .catch(error => {
-                console.error('上传失败:', error);
-            });
-    });
+    })
 
     function logout() {
         // 发起注销请求

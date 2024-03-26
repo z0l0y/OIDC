@@ -15,7 +15,7 @@ import java.io.IOException;
 
 
 @Slf4j
-@WebFilter(urlPatterns = "/user/update")
+@WebFilter(urlPatterns = "")
 public class LoginCheckFilter implements Filter {
     /*  可以点那个更多操作，可以自己导入的*/
     @Override

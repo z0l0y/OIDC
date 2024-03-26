@@ -178,7 +178,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.data) {
-// 将JWT令牌保存到HTTP Cookie中
+                    // 将JWT令牌保存到HTTP Cookie中
                     document.cookie = `token=${data.data}; path=/;`;
 
                     // 向后端发送请求获取用户基本信息
@@ -191,9 +191,9 @@
                         .then(response => response.json())
                         .then(userInfo => {
                             // 构造重定向URL并添加用户基本信息
-                            const userProfileURL = `http://localhost:63342/OIDC/static/userProfile.html?username=${userInfo.data.username}&nickname=${userInfo.data.nickname}&bio=${userInfo.data.bio}&avatar=${userInfo.data.avatar}`;
-
+                            const userProfileURL = `http://localhost:63342/OIDC/static/userProfile.html`;
                             // 重定向到userProfile.html
+                            // 有了cookie之后就不要带?username=${userInfo.data.username}&nickname=${userInfo.data.nickname}&bio=${userInfo.data.bio}&avatar=${userInfo.data.avatar}了，要不然直接显示在URL里面可能会遭到恶意修改
                             window.location.href = userProfileURL;
                         })
                         .catch(error => {
