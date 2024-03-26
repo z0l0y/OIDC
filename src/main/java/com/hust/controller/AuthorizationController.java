@@ -30,6 +30,11 @@ public class AuthorizationController {
         }
     }
 
+/*    @PostMapping("/")
+    public Result getAccessToken(@RequestBody ){
+
+    }*/
+
     @GetMapping("/login/oauth/authorize")
     public Result authorizeBangumi() {
         return Result.success(AUTHORIZATION_SUCCESS);

@@ -2,7 +2,9 @@ package com.hust.utils;
 
 import com.hust.dto.AppDTO;
 import com.hust.dto.UserDTO;
+import com.hust.dto.VerifyDTO;
 import com.hust.po.AppPO;
+import com.hust.po.ResourcePO;
 import com.hust.po.UserPO;
 import com.hust.vo.UserVO;
 
@@ -57,5 +59,12 @@ public class Conversion {
         userVO.setAvatar(userPO.getAvatar());
         userVO.setBio(userPO.getBio());
         return userVO;
+    }
+
+    public static ResourcePO toResourcePO(VerifyDTO verifyDTO) {
+        ResourcePO resourcePO = new ResourcePO();
+        resourcePO.setUsername(verifyDTO.getUsername());
+        resourcePO.setPassword(verifyDTO.getPassword());
+        return resourcePO;
     }
 }
