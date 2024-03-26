@@ -1,6 +1,7 @@
 package com.hust.controller;
 
 import com.hust.dto.AppDTO;
+import com.hust.dto.AuthorizeDTO;
 import com.hust.service.AuthorizationService;
 import com.hust.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,21 @@ public class AuthorizationController {
 
     }*/
 
+    @PostMapping("/login/oauth/authorize")
+    public Result authorizeMyApp(@RequestBody AuthorizeDTO authorizeDTO) {
+        Result authorize = authorizationService.authorize(authorizeDTO);
+        if (authorize.getCode() == 1) {
+            return Result.success("授权成功！");
+        } else {
+            return Result.error("授权失败！");
+        }
+    }
+
+/*
     @GetMapping("/login/oauth/authorize")
     public Result authorizeBangumi() {
         return Result.success(AUTHORIZATION_SUCCESS);
     }
+*/
 
 }

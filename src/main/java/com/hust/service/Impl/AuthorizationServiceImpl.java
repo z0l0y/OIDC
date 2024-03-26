@@ -1,6 +1,7 @@
 package com.hust.service.Impl;
 
 import com.hust.dto.AppDTO;
+import com.hust.dto.AuthorizeDTO;
 import com.hust.mapper.AuthorizationMapper;
 import com.hust.po.AppPO;
 import com.hust.po.UserPO;
@@ -28,6 +29,17 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         int rowsAffected = authorizationMapper.createApp(appPO);
         if (rowsAffected > 0) {
             return Result.success(uuid);
+        } else {
+            return Result.error();
+        }
+    }
+
+    @Override
+    public Result authorize(AuthorizeDTO authorizeDTO){
+        AppPO appPO = toAppPO(authorizeDTO);
+        int rowsAffected = authorizationMapper.insertState(appPO);
+        if (rowsAffected > 0) {
+            return Result.success();
         } else {
             return Result.error();
         }

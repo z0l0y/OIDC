@@ -1,5 +1,6 @@
 package com.hust.controller;
 
+import com.hust.dto.AuthorizeDTO;
 import com.hust.dto.UserDTO;
 import com.hust.service.UserService;
 import com.hust.utils.JwtUtils;
@@ -9,6 +10,7 @@ import com.hust.vo.UserVO;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.*;
@@ -84,9 +86,7 @@ public class UserController {
     @GetMapping("/profile")
     public Result getUserProfile(@RequestHeader("Authorization") String authorizationHeader) {
         // 提取JWT令牌的内容
-        System.out.println("token" + authorizationHeader);
         String token = authorizationHeader.substring(7); // 去除"Bearer "前缀
-        System.out.println(token);
         Claims claims = parseJWT(token);
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername((String) claims.get("username"));
@@ -94,4 +94,5 @@ public class UserController {
         userDTO.setPassword((String) claims.get("password"));
         return userService.getUserProfile(userDTO);
     }
+
 }
