@@ -2,6 +2,7 @@ package com.hust.service;
 
 import com.hust.dto.UserDTO;
 import com.hust.utils.Result;
+import com.hust.vo.UserVO;
 
 import javax.mail.MessagingException;
 import java.security.GeneralSecurityException;
@@ -27,4 +28,6 @@ public interface UserService {
      */
     // TODO 我们这里要考虑重名的问题，这样查出来才不会是两个用户
     Result updateUserInfo(UserDTO userDTO);
+
+    Result getUserProfile(UserDTO userDTO);
 }

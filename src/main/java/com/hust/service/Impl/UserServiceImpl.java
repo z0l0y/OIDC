@@ -84,4 +84,16 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public Result getUserProfile(UserDTO userDTO) {
+        UserPO userPO = toUserPO(userDTO);
+        UserPO userProfile = userMapper.getUserProfile(userPO);
+        if (userProfile == null) {
+            return Result.error();
+        } else {
+            UserVO userVO = toUserVO(userProfile);
+            return Result.success(userVO);
+        }
+    }
+
 }

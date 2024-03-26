@@ -31,4 +31,7 @@ public interface UserMapper {
      * @return 修改用户信息是否成功，1代表成功，0代表失败
      */
     int updateUserInfo(UserPO userPO);
+
+    @Select("select * from oidc.user_info where username = #{username} and password = #{password}")
+    UserPO getUserProfile(UserPO userPO);
 }

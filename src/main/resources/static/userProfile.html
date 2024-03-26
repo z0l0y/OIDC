@@ -181,6 +181,8 @@
 </div>
 
 <script>
+    // 注意一下，我们这里其实还可以进行优化，就是有cookie的话我们就重新写一个页面，可以不用显示游客的界面，要不然会有跳转的痕迹，比较的丑陋
+
     // 通过重定向的URL来获取一些不敏感的用户信息，这边获取的都是一些基本的信息，其他用户也可以看的到，所以这边没有进行加密传输
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get('username');
@@ -205,6 +207,48 @@
     avatarElement.onerror = function () {
         avatarElement.src = defaultAvatar;
     };
+
+
+    // 从Cookie中获取JWT令牌的值
+    function getJwtTokenFromCookie() {
+        var cookieString = decodeURIComponent(document.cookie);
+        var cookies = cookieString.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.startsWith('token=')) {
+                return cookie.substring('token='.length);
+            }
+        }
+        return '';
+    }
+
+    // 填充用户个人资料页面的字段
+    function fillUserProfileFields() {
+        var jwtToken = getJwtTokenFromCookie();
+
+        // 发送请求到服务器获取用户个人资料数据
+        // 这里使用示例的fetch函数发送GET请求，您可以根据实际情况选择合适的方式
+        fetch('http://localhost:8080/user/profile', {
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 填充字段
+                document.querySelector('.username').textContent = data.data.username;
+                document.querySelector('.nickname').textContent = data.data.nickname;
+                document.querySelector('.bio').textContent = data.data.bio;
+                document.querySelector('.avatar').src = data.data.avatar;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    // 页面加载时调用填充字段函数
+    fillUserProfileFields();
+
 
     function enableUploadButton() {
         var fileInput = document.getElementById('avatar-upload');

@@ -176,37 +176,52 @@
             body: JSON.stringify(requestData)
         })
             .then(response => response.json())
-            /*  .then(data => {
-                  const userInfoDiv = document.getElementById('user-info');
-                  userInfoDiv.innerHTML = `
-                      <h2>User Information</h2>
-                      <p><strong>Username:</strong> ${data.data.username}</p>
-                      <p><strong>Nickname:</strong> ${data.data.nickname}</p>
-                      <p><strong>Avatar:</strong> ${data.data.avatar}</p>
-                      <p><strong>Bio:</strong> ${data.data.bio}</p>
-                  `;
-              })*/
             .then(data => {
-                if (data.msg === "success") {
-                    // 构造查询参数字符串
-                    const params = new URLSearchParams();
-                    params.append('username', data.data.username);
-                    params.append('nickname', data.data.nickname);
-                    params.append('avatar', data.data.avatar);
-                    params.append('bio', data.data.bio);
+                if (data.data) {
+// 将JWT令牌保存到HTTP Cookie中
+                    document.cookie = `token=${data.data}; path=/;`;
 
-                    // 构造重定向URL
-                    const userProfileURL = 'http://localhost:63342/OIDC/static/userProfile.html?' + params.toString();
+                    // 向后端发送请求获取用户基本信息
+                    fetch('http://localhost:8080/user/profile', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${data.data}`
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(userInfo => {
+                            // 构造重定向URL并添加用户基本信息
+                            const userProfileURL = `http://localhost:63342/OIDC/static/userProfile.html?username=${userInfo.data.username}&nickname=${userInfo.data.nickname}&bio=${userInfo.data.bio}&avatar=${userInfo.data.avatar}`;
 
-                    // 重定向到userProfile.html
-                    window.location.href = userProfileURL;
-                } else {
-                    console.error('登录失败');
+                            // 重定向到userProfile.html
+                            window.location.href = userProfileURL;
+                        })
+                        .catch(error => {
+                            // 错误处理逻辑
+                        })
+                        /* .then(data => {
+                         if (data.msg === "success") {
+                             // 构造查询参数字符串
+                             const params = new URLSearchParams();
+                             params.append('username', data.data.username);
+                             params.append('nickname', data.data.nickname);
+                             params.append('avatar', data.data.avatar);
+                             params.append('bio', data.data.bio);
+
+                             // 构造重定向URL
+                             const userProfileURL = 'http://localhost:63342/OIDC/static/userProfile.html?' + params.toString();
+
+                             // 重定向到userProfile.html
+                             window.location.href = userProfileURL;
+                         } else {
+                             console.error('登录失败');
+                         }
+                     })*/
+                        .catch(error => {
+                            console.error('Failed to fetch user information:', error);
+                        });
                 }
             })
-            .catch(error => {
-                console.error('Failed to fetch user information:', error);
-            });
     }
 </script>
 </body>

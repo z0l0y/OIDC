@@ -2,20 +2,23 @@ package com.hust.controller;
 
 import com.hust.dto.UserDTO;
 import com.hust.service.UserService;
+import com.hust.utils.JwtUtils;
 import com.hust.utils.Result;
 import com.hust.utils.UploadUtil;
+import com.hust.vo.UserVO;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.*;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.hust.utils.Constants.*;
+import static com.hust.utils.JwtUtils.parseJWT;
 
 @RestController
 @RequestMapping("/user")
@@ -47,8 +50,15 @@ public class UserController {
             return Result.error(INVALID_DATA_ERROR_MESSAGE);
         }
         if (isLoginBangumi.getCode() == 1) {
-            return isLoginBangumi;
+            //登录成功，生成令牌，下发令牌
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("username", userDTO.getUsername());
+            claims.put("password", userDTO.getPassword());
+
+            String token = JwtUtils.generateJwt(claims);
+            return Result.success(token);
         } else {
+            // 登录失败，放回错误信息
             return Result.error(LOGIN_FAILURE);
         }
     }
@@ -62,6 +72,7 @@ public class UserController {
     @PostMapping("/update")
     public Result updateUserInfo(@RequestBody UserDTO userDTO) {
         // 首先我们要考虑，有什么信息是要update的，一般就是nickname和bio
+        // 要求登录后才能修改信息，主要是你没有注册我也不会把你修改的数据存储起来
         Result updateResult = userService.updateUserInfo(userDTO);
         if (updateResult.getCode() == 1) {
             return Result.success("修改信息成功！");
@@ -70,4 +81,17 @@ public class UserController {
         }
     }
 
+    @GetMapping("/profile")
+    public Result getUserProfile(@RequestHeader("Authorization") String authorizationHeader) {
+        // 提取JWT令牌的内容
+        System.out.println("token" + authorizationHeader);
+        String token = authorizationHeader.substring(7); // 去除"Bearer "前缀
+        System.out.println(token);
+        Claims claims = parseJWT(token);
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUsername((String) claims.get("username"));
+        // 注意不要直接ctrl+D要不然注意了后面的参数，前面的方法没有改，会造成恶性BUG，很难检查出来
+        userDTO.setPassword((String) claims.get("password"));
+        return userService.getUserProfile(userDTO);
+    }
 }
