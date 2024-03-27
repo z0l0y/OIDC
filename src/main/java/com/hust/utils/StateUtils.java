@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class StateUtils {
     private static final String signKey = "hust";
-    private static final Long expire = 60 * 5L;
+    private static final Long expire = 60 * 5 * 1000L;
 
     //产生jwt令牌
     public static String generateState(Map<String, Object> claims) {

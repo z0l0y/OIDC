@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class CodeUtils {
     private static final String signKey = "hust";
-    private static final Long expire = 60 * 5L;
+    private static final Long expire = 60 * 5 * 1000L;
 
     //产生jwt令牌
     public static String generateCode(Map<String, Object> claims) {

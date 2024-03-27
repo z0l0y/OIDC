@@ -5,8 +5,10 @@ import com.hust.dto.AuthorizeDTO;
 import com.hust.dto.TokenDTO;
 import com.hust.dto.StateDTO;
 import com.hust.service.AuthorizationService;
+import com.hust.utils.AccessTokenUtils;
 import com.hust.utils.CodeUtils;
 import com.hust.utils.Result;
+import com.hust.utils.StateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,7 +58,7 @@ public class AuthorizationController {
         // 插入从这个请求中获取到的state参数，便于我们后期进行比对
         Result authorize = authorizationService.authorize(authorizeDTO);
         if (authorize.getCode() == 1) {
-            return Result.success();
+            return Result.success("成功与授权服务器建立起连接！");
         } else {
             return Result.error("用其他平台的账号登录失败！");
         }
@@ -75,20 +77,31 @@ public class AuthorizationController {
      * 5，在我们的授权服务器发放code之后，就可以完全在我们的后端来处理逻辑了，注意token的时效性，首先要验证然后才能进行下面的逻辑
      *
      * @param tokenDTO 包含了我们刚才获取到的code，还有第三方的client_id和client_secret，准备获取access_token去资源服务器获取我们的数据然后给第三方了！
-     * @return 返回access token，同样注意时效性
+     * @return 返回access token和refresh token，同样注意时效性
      */
-    @PostMapping("/get/accessToken")
+    @PostMapping("/get/token")
     public Result getAccessToken(@RequestBody TokenDTO tokenDTO) {
         byte[] decodedBytes = Base64.getDecoder().decode(tokenDTO.getCode());
         String code = new String(decodedBytes);
         Result result = examineToken(code);
         if (result.getCode() == 1) {
-            authorizationService.verifyClientInfo(tokenDTO);
+            Result verify = authorizationService.verifyClientInfo(tokenDTO);
+            if (verify.getCode() == 1) {
+                Map<String, Object> claims = new HashMap<>();
+                String uuidAccessToken = UUID.randomUUID().toString().replace("-", "");
+                String uuidRefreshToken = UUID.randomUUID().toString().replace("-", "");
+                claims.put("accessToken", uuidAccessToken);
+                claims.put("refreshToken", uuidRefreshToken);
+                String token = AccessTokenUtils.generateAccessToken(claims);
+                String base64Token = Base64.getEncoder().encodeToString(token.getBytes());
+                return Result.success(base64Token);
+            } else {
+                return Result.error("URL错误，请检查！");
+            }
 
         } else {
-            return Result.error("获取access token失败！");
+            return Result.error("code非法！");
         }
-        return Result.success();
     }
 
 }

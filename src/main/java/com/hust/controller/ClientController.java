@@ -35,13 +35,13 @@ public class ClientController {
         String uuidState = UUID.randomUUID().toString().replace("-", "");
         claims.put("code", uuidState);
         String state = StateUtils.generateState(claims);
-        String Base64State = Base64.getEncoder().encodeToString(state.getBytes());
+        String base64State = Base64.getEncoder().encodeToString(state.getBytes());
 /*        // 解码
         byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
         String decodedString = new String(decodedBytes);*/
         // 不不不我们不用考虑这么多因为Base64一般也不会重名的，我们只用看要有没有就行了
-        clientService.storeState(Base64State);
-        return Result.success(Base64State);
+        clientService.storeState(base64State);
+        return Result.success(base64State);
     }
 
     /**

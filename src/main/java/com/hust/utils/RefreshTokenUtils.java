@@ -10,7 +10,7 @@ import java.util.Map;
 public class RefreshTokenUtils {
     private static final String signKey = "hust";
     // 这里其实还可以优化一下，建议直接算出来，要不然程序每次生成token的时候都要进行计算，会浪费一部分的性能
-    private static final Long expire = 60 * 60 * 24 * 30 * 3L;
+    private static final Long expire = 60 * 60 * 24 * 30 * 3 * 1000L;
 
     //产生jwt令牌
     public static String generateRefreshToken(Map<String, Object> claims) {

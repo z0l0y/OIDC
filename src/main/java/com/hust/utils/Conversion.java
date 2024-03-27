@@ -1,9 +1,6 @@
 package com.hust.utils;
 
-import com.hust.dto.AppDTO;
-import com.hust.dto.AuthorizeDTO;
-import com.hust.dto.UserDTO;
-import com.hust.dto.VerifyDTO;
+import com.hust.dto.*;
 import com.hust.po.AppPO;
 import com.hust.po.ResourcePO;
 import com.hust.po.UserPO;
@@ -75,5 +72,14 @@ public class Conversion {
         resourcePO.setUsername(verifyDTO.getUsername());
         resourcePO.setPassword(verifyDTO.getPassword());
         return resourcePO;
+    }
+
+    public static AppPO toAppPO(TokenDTO tokenDTO) {
+        AppPO appPO = new AppPO();
+        appPO.setClientId(tokenDTO.getClient_id());
+        appPO.setClientSecret(tokenDTO.getClient_secret());
+        appPO.setCode(tokenDTO.getCode());
+        appPO.setRedirectUrl(tokenDTO.getRedirect_uri());
+        return appPO;
     }
 }

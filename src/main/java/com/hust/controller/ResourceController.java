@@ -35,8 +35,8 @@ public class ResourceController {
             String uuidCode = UUID.randomUUID().toString().replace("-", "");
             claims.put("code", uuidCode);
             String code = CodeUtils.generateCode(claims);
-            String Base64Code = Base64.getEncoder().encodeToString(code.getBytes());
-            return Result.success(Base64Code);
+            String base64Code = Base64.getEncoder().encodeToString(code.getBytes());
+            return Result.success(base64Code);
         } else {
             return Result.error("用户信息验证失败，授权失败！");
         }
