@@ -2,12 +2,12 @@ package com.hust.controller;
 
 import com.hust.dto.AppDTO;
 import com.hust.dto.AuthorizeDTO;
+import com.hust.dto.TokenDTO;
+import com.hust.dto.StateDTO;
 import com.hust.service.AuthorizationService;
 import com.hust.utils.CodeUtils;
-import com.hust.utils.JwtUtils;
 import com.hust.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.hust.utils.ExamineTokenExpire.examineToken;
+
 @RestController
 public class AuthorizationController {
     @Autowired
@@ -24,6 +26,12 @@ public class AuthorizationController {
 
     private static final String AUTHORIZATION_SUCCESS = "申请授权第三方成功！";
 
+    /**
+     * 1，首先你这个第三方要在我授权服务器上面注册你的相关信息，顺便放回给你一个唯一的Client_id
+     *
+     * @param appDTO
+     * @return
+     */
     @PostMapping("/settings/apps/new")
     public Result registerOAuth2(@RequestBody AppDTO appDTO) {
         Result isCreateApp = authorizationService.createApp(appDTO);
@@ -36,32 +44,51 @@ public class AuthorizationController {
         }
     }
 
-/*    @PostMapping("/")
-    public Result getAccessToken(@RequestBody ){
-
-    }*/
-
+    /**
+     * ，2.2，然后，用户点击用其他平台的账号登录才能调用这样一个接口，用于在我们的授权服务器里面存储好state，便于防范CSRF攻击
+     * 注意前端应该先调用我们ClientController的方法，产生一个state后才能调用这个方法，将state加到URL里面
+     *
+     * @param authorizeDTO 类似于用GitHub，刚进去的时候的页面上面的URL，发这个请求的目的是将Client生成的state存储起来
+     * @return 进入页面是否成功
+     */
     @PostMapping("/login/oauth/authorize")
     public Result authorizeMyApp(@RequestBody AuthorizeDTO authorizeDTO) {
+        // 插入从这个请求中获取到的state参数，便于我们后期进行比对
         Result authorize = authorizationService.authorize(authorizeDTO);
         if (authorize.getCode() == 1) {
-            //登录成功，生成令牌，下发令牌
-            Map<String, Object> claims = new HashMap<>();
-            String uuidCode = UUID.randomUUID().toString().replace("-", "");
-            claims.put("code", uuidCode);
-            String code = CodeUtils.generateCode(claims);
-            String Base64Code = Base64.getEncoder().encodeToString(code.getBytes());
-            return Result.success(Base64Code);
+            return Result.success();
         } else {
-            return Result.error("授权失败！");
+            return Result.error("用其他平台的账号登录失败！");
         }
     }
 
-/*
-    @GetMapping("/login/oauth/authorize")
-    public Result authorizeBangumi() {
-        return Result.success(AUTHORIZATION_SUCCESS);
+
+
+    /*
+        @GetMapping("/login/oauth/authorize")
+        public Result authorizeBangumi() {
+            return Result.success(AUTHORIZATION_SUCCESS);
+        }
+    */
+
+    /**
+     * 5，在我们的授权服务器发放code之后，就可以完全在我们的后端来处理逻辑了，注意token的时效性，首先要验证然后才能进行下面的逻辑
+     *
+     * @param tokenDTO 包含了我们刚才获取到的code，还有第三方的client_id和client_secret，准备获取access_token去资源服务器获取我们的数据然后给第三方了！
+     * @return 返回access token，同样注意时效性
+     */
+    @PostMapping("/get/accessToken")
+    public Result getAccessToken(@RequestBody TokenDTO tokenDTO) {
+        byte[] decodedBytes = Base64.getDecoder().decode(tokenDTO.getCode());
+        String code = new String(decodedBytes);
+        Result result = examineToken(code);
+        if (result.getCode() == 1) {
+            authorizationService.verifyClientInfo(tokenDTO);
+
+        } else {
+            return Result.error("获取access token失败！");
+        }
+        return Result.success();
     }
-*/
 
 }
