@@ -3,6 +3,7 @@ package com.hust.utils;
 import com.hust.dto.*;
 import com.hust.po.*;
 import com.hust.vo.CollectionVO;
+import com.hust.vo.FriendShipVO;
 import com.hust.vo.ResourceInfoVO;
 import com.hust.vo.UserVO;
 
@@ -138,6 +139,12 @@ public class Conversion {
         collectionVO.setAnimeName(collectionPO.getAnimeName());
         collectionVO.setType(collectionPO.getType());
         return collectionVO;
+    }
+
+    public static FriendShipVO toFriendShipVO(FriendShipPO friendShipPO) {
+        FriendShipVO friendShipVO = new FriendShipVO();
+        friendShipVO.setUser1(friendShipPO.getUser1());
+        return friendShipVO;
     }
 
 }
