@@ -1,6 +1,7 @@
 package com.hust.utils;
 
 import com.hust.dto.*;
+import com.hust.po.AnimePO;
 import com.hust.po.AppPO;
 import com.hust.po.ResourcePO;
 import com.hust.po.UserPO;
@@ -91,4 +92,31 @@ public class Conversion {
         resourceInfoVO.setBio(resourcePO.getBio());
         return resourceInfoVO;
     }
+
+    public static AnimePO toAnimePO(AnimeDTO animeDTO) {
+        // 过个滤先，避免到时候字段不全发生NPE
+        if (animeDTO.getAvatar() == null) {
+            animeDTO.setAvatar("");
+        }
+        if (animeDTO.getDirector() == null) {
+            animeDTO.setDirector("");
+        }
+        if (animeDTO.getEpisodes() == null) {
+            animeDTO.setEpisodes(1);
+        }
+        if (animeDTO.getIntroduction() == null) {
+            animeDTO.setIntroduction("");
+        }
+        if (animeDTO.getName() == null) {
+            animeDTO.setName("");
+        }
+        AnimePO animePO = new AnimePO();
+        animePO.setName(animeDTO.getName());
+        animePO.setEpisodes(animeDTO.getEpisodes());
+        animePO.setDirector(animeDTO.getDirector());
+        animePO.setAvatar(animeDTO.getAvatar());
+        animePO.setIntroduction(animeDTO.getIntroduction());
+        return animePO;
+    }
+
 }
