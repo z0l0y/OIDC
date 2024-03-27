@@ -1,10 +1,8 @@
 package com.hust.utils;
 
 import com.hust.dto.*;
-import com.hust.po.AnimePO;
-import com.hust.po.AppPO;
-import com.hust.po.ResourcePO;
-import com.hust.po.UserPO;
+import com.hust.po.*;
+import com.hust.vo.CollectionVO;
 import com.hust.vo.ResourceInfoVO;
 import com.hust.vo.UserVO;
 
@@ -117,6 +115,29 @@ public class Conversion {
         animePO.setAvatar(animeDTO.getAvatar());
         animePO.setIntroduction(animeDTO.getIntroduction());
         return animePO;
+    }
+
+    public static CollectionPO toCollectionPO(CollectDTO collectDTO) {
+        CollectionPO collectionPO = new CollectionPO();
+        collectionPO.setUsername(collectDTO.getUsername());
+        collectionPO.setAnimeName(collectDTO.getAnimeName());
+        collectionPO.setType(collectDTO.getType());
+        return collectionPO;
+    }
+
+    public static RatingPO toRatingPO(CollectDTO collectDTO) {
+        RatingPO ratingPO = new RatingPO();
+        ratingPO.setRatingValue(collectDTO.getRatingValue());
+        ratingPO.setAnimeName(collectDTO.getAnimeName());
+        ratingPO.setCommentary(collectDTO.getCommentary());
+        return ratingPO;
+    }
+
+    public static CollectionVO toCollectionVO(CollectionPO collectionPO) {
+        CollectionVO collectionVO = new CollectionVO();
+        collectionVO.setAnimeName(collectionPO.getAnimeName());
+        collectionVO.setType(collectionPO.getType());
+        return collectionVO;
     }
 
 }
