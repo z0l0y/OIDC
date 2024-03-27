@@ -24,12 +24,16 @@ DROP TABLE IF EXISTS `anime`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `anime`
 (
-    `id`       bigint unsigned NOT NULL AUTO_INCREMENT,
-    `name`     varchar(64)     NOT NULL DEFAULT '',
-    `episodes` int             NOT NULL DEFAULT '1',
-    `director` varchar(64)     NOT NULL DEFAULT '',
+    `id`           bigint unsigned NOT NULL AUTO_INCREMENT,
+    `name`         varchar(64)     NOT NULL DEFAULT '',
+    `episodes`     int             NOT NULL DEFAULT '1',
+    `director`     varchar(256)    NOT NULL DEFAULT '',
+    `avatar`       varchar(256)    NOT NULL DEFAULT '',
+    `introduction` varchar(512)    NOT NULL DEFAULT '',
+    `is_deleted`   tinyint         NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
+  AUTO_INCREMENT = 11
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -41,6 +45,21 @@ CREATE TABLE `anime`
 LOCK TABLES `anime` WRITE;
 /*!40000 ALTER TABLE `anime`
     DISABLE KEYS */;
+INSERT INTO `anime`
+VALUES (1, '来自新世界', 25, '石滨真史', '', '', 0),
+       (2, 'ZETMAN', 13, '锅岛修', '', '', 0),
+       (3, '黑礁', 24, '广江礼威', '', '', 1),
+       (4, 'monster', 74, '小岛正幸', '', '', 0),
+       (5, '', 1, '', '', '', 0),
+       (6, '', 1, '', '', '', 0),
+       (7, '', 1, '', '', '', 0),
+       (8, '', 1, '', '', '', 0),
+       (9, 'XXX', 11, '饭田马之介',
+        'https://aliyun-oss-imgsofts.xlxba.com/wp-content/uploads/2023/12/a24b2fe36d3894e6377217befa23c58b.jpg',
+        '暴力美学巅峰之作', 0),
+       (10, '地狱之歌', 11, '饭田马之介',
+        'https://aliyun-oss-imgsofts.xlxba.com/wp-content/uploads/2023/12/a24b2fe36d3894e6377217befa23c58b.jpg',
+        '暴力美学巅峰之作', 0);
 /*!40000 ALTER TABLE `anime`
     ENABLE KEYS */;
 UNLOCK TABLES;
@@ -170,6 +189,7 @@ CREATE TABLE `collection`
     `type`       varchar(4)      NOT NULL DEFAULT '',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
+  AUTO_INCREMENT = 7
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -181,6 +201,13 @@ CREATE TABLE `collection`
 LOCK TABLES `collection` WRITE;
 /*!40000 ALTER TABLE `collection`
     DISABLE KEYS */;
+INSERT INTO `collection`
+VALUES (1, 'root', '黑礁', '想看'),
+       (2, 'hust', '地狱之歌', '想看'),
+       (3, 'hust', '来自新世界', '想看'),
+       (4, 'hust', '来自新世界', '想看'),
+       (5, 'root', '来自新世界', '想看'),
+       (6, 'root', '地狱之歌', '想看');
 /*!40000 ALTER TABLE `collection`
     ENABLE KEYS */;
 UNLOCK TABLES;
@@ -200,6 +227,7 @@ CREATE TABLE `friendship`
     `status` int             NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
+  AUTO_INCREMENT = 2
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -211,6 +239,8 @@ CREATE TABLE `friendship`
 LOCK TABLES `friendship` WRITE;
 /*!40000 ALTER TABLE `friendship`
     DISABLE KEYS */;
+INSERT INTO `friendship`
+VALUES (1, 'hust', 'root', 1);
 /*!40000 ALTER TABLE `friendship`
     ENABLE KEYS */;
 UNLOCK TABLES;
@@ -225,11 +255,15 @@ DROP TABLE IF EXISTS `rating`;
 CREATE TABLE `rating`
 (
     `id`           bigint unsigned NOT NULL AUTO_INCREMENT,
-    `rating_value` int             NOT NULL DEFAULT '10',
+    `username`     varchar(32)     NOT NULL DEFAULT '',
     `anime_name`   varchar(64)     NOT NULL DEFAULT '',
+    `rating_value` int             NOT NULL DEFAULT '10',
     `commentary`   varchar(512)    NOT NULL DEFAULT '',
+    `gmt_create`   datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `gmt_modified` datetime                 DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
+  AUTO_INCREMENT = 7
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -241,6 +275,13 @@ CREATE TABLE `rating`
 LOCK TABLES `rating` WRITE;
 /*!40000 ALTER TABLE `rating`
     DISABLE KEYS */;
+INSERT INTO `rating`
+VALUES (1, '', '黑礁', 8, '黑道番太好看啦！', '2024-03-27 22:13:38', '2024-03-27 22:15:09'),
+       (2, '', '地狱之歌', 8, '黑道番太好看啦！', '2024-03-27 22:28:17', '2024-03-27 22:28:17'),
+       (3, '', '来自新世界', 8, '黑道番太好看啦！', '2024-03-27 22:29:04', '2024-03-27 22:29:04'),
+       (4, 'hust', '来自新世界', 8, '黑道番太好看啦！', '2024-03-27 22:41:11', '2024-03-27 22:41:11'),
+       (5, 'root', '来自新世界', 8, '黑道番太好看啦！', '2024-03-27 22:41:17', '2024-03-27 22:41:17'),
+       (6, 'root', '地狱之歌', 8, '这就是暴力美学！', '2024-03-27 22:42:02', '2024-03-27 22:42:02');
 /*!40000 ALTER TABLE `rating`
     ENABLE KEYS */;
 UNLOCK TABLES;
@@ -330,8 +371,8 @@ LOCK TABLES `user_info` WRITE;
 INSERT INTO `user_info`
 VALUES (1, '2024-03-24 13:03:24', '2024-03-24 13:03:24', 'root', 'roothust', 'hust@qq.com', 'root',
         'https://picture-zoloy.oss-cn-wuhan-lr.aliyuncs.com/409f6616590c402ea63689f7a694595e.jpg', '12', 0),
-       (2, '2024-03-25 15:51:59', '2024-03-25 15:51:59', '123333333333', '1233333333333333', '421634412@qq.com',
-        '123333333333', '123', '', 0);
+       (2, '2024-03-25 15:51:59', '2024-03-25 15:51:59', 'hust', '1233333333333333', '421634412@qq.com', '123333333333',
+        '123', '', 0);
 /*!40000 ALTER TABLE `user_info`
     ENABLE KEYS */;
 UNLOCK TABLES;
@@ -345,4 +386,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION = @OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES = @OLD_SQL_NOTES */;
 
--- Dump completed on 2024-03-27 17:44:39
+-- Dump completed on 2024-03-27 22:55:29
