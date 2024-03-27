@@ -6,10 +6,7 @@ import com.hust.dto.TokenDTO;
 import com.hust.dto.StateDTO;
 import com.hust.pojo.Token;
 import com.hust.service.AuthorizationService;
-import com.hust.utils.AccessTokenUtils;
-import com.hust.utils.CodeUtils;
-import com.hust.utils.Result;
-import com.hust.utils.StateUtils;
+import com.hust.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -100,11 +97,16 @@ public class AuthorizationController {
                 String uuidRefreshToken = UUID.randomUUID().toString().replace("-", "");
                 claims.put("accessToken", uuidAccessToken);
                 claims.put("refreshToken", uuidRefreshToken);
-                String token = AccessTokenUtils.generateAccessToken(claims);
-                String base64Token = Base64.getEncoder().encodeToString(token.getBytes());
+                String accessToken = AccessTokenUtils.generateAccessToken(claims);
+                String refreshToken = RefreshTokenUtils.generateRefreshToken(claims);
+                String base64AccessToken = Base64.getEncoder().encodeToString(accessToken.getBytes());
+                String base64RefreshToken = Base64.getEncoder().encodeToString(refreshToken.getBytes());
+                Map<String, Object> token = new HashMap<>();
+                token.put("accessToken",base64AccessToken);
+                token.put("refreshToken",base64RefreshToken);
                 Token storageToken = storageToken(uuidAccessToken, uuidRefreshToken, tokenDTO.getCode());
                 authorizationService.storageToken(storageToken);
-                return Result.success(base64Token);
+                return Result.success(token);
             } else {
                 return Result.error("URL错误，请检查！");
             }

@@ -1,5 +1,6 @@
 package com.hust.controller;
 
+import com.hust.dto.AccessTokenDTO;
 import com.hust.dto.VerifyDTO;
 import com.hust.pojo.Code;
 import com.hust.pojo.Token;
@@ -50,11 +51,19 @@ public class ResourceController {
     }
 
     /**
-     * 使用访问令牌访问受保护资源
-     * @return
+     * 6.目前看来就只有state是在第三方得到的，其他的逻辑都在我们信任的资源服务器和授权服务器这边，现在看来确实安全很多
+     * 最后一步，就是解析获取到的Base64编码，得到token进行了（除了client_state，其他的都是在我们这边的表，所以第三方也只能拿到state数据，其他的都是拿不到的，所以很安全）
+     *
+     * @param accessTokenDTO 第5步获取到的token（Base64编码格式）
+     * @return 用户的信息
      */
-/*    @PostMapping("/get/userInfo")
-    public Result getUserInfo(@RequestBody ){
-
-    }*/
+    @PostMapping("/get/userInfo")
+    public Result getUserInfo(@RequestBody AccessTokenDTO accessTokenDTO) {
+        Result userInfo = resourceService.getUserInfo(accessTokenDTO);
+        if (userInfo.getCode() == 1) {
+            return userInfo;
+        } else {
+            return Result.error("太久没有登录啦。请重新登录一下吧！");
+        }
+    }
 }

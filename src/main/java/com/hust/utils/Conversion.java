@@ -4,6 +4,7 @@ import com.hust.dto.*;
 import com.hust.po.AppPO;
 import com.hust.po.ResourcePO;
 import com.hust.po.UserPO;
+import com.hust.vo.ResourceInfoVO;
 import com.hust.vo.UserVO;
 
 public class Conversion {
@@ -79,5 +80,15 @@ public class Conversion {
         appPO.setClientSecret(tokenDTO.getClient_secret());
         appPO.setRedirectUrl(tokenDTO.getRedirect_uri());
         return appPO;
+    }
+
+    public static ResourceInfoVO toResourceInfoVO(ResourcePO resourcePO) {
+        ResourceInfoVO resourceInfoVO = new ResourceInfoVO();
+        resourceInfoVO.setUsername(resourcePO.getUsername());
+        resourceInfoVO.setNickname(resourcePO.getNickname());
+        resourceInfoVO.setEmail(resourcePO.getEmail());
+        resourceInfoVO.setAvatar(resourcePO.getAvatar());
+        resourceInfoVO.setBio(resourcePO.getBio());
+        return resourceInfoVO;
     }
 }
