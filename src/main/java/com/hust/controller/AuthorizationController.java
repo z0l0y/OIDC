@@ -4,6 +4,7 @@ import com.hust.dto.AppDTO;
 import com.hust.dto.AuthorizeDTO;
 import com.hust.dto.TokenDTO;
 import com.hust.dto.StateDTO;
+import com.hust.pojo.Token;
 import com.hust.service.AuthorizationService;
 import com.hust.utils.AccessTokenUtils;
 import com.hust.utils.CodeUtils;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.hust.utils.ExamineTokenExpire.examineToken;
+import static com.hust.utils.StorageUtils.storageToken;
 
 @RestController
 public class AuthorizationController {
@@ -83,7 +85,13 @@ public class AuthorizationController {
     public Result getAccessToken(@RequestBody TokenDTO tokenDTO) {
         byte[] decodedBytes = Base64.getDecoder().decode(tokenDTO.getCode());
         String code = new String(decodedBytes);
-        Result result = examineToken(code);
+        Result result = new Result();
+        try {
+            result = examineToken(code);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return Result.error("您的code非法或已过期，请重新授权！");
+        }
         if (result.getCode() == 1) {
             Result verify = authorizationService.verifyClientInfo(tokenDTO);
             if (verify.getCode() == 1) {
@@ -94,11 +102,12 @@ public class AuthorizationController {
                 claims.put("refreshToken", uuidRefreshToken);
                 String token = AccessTokenUtils.generateAccessToken(claims);
                 String base64Token = Base64.getEncoder().encodeToString(token.getBytes());
+                Token storageToken = storageToken(uuidAccessToken, uuidRefreshToken, tokenDTO.getCode());
+                authorizationService.storageToken(storageToken);
                 return Result.success(base64Token);
             } else {
                 return Result.error("URL错误，请检查！");
             }
-
         } else {
             return Result.error("code非法！");
         }

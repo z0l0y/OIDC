@@ -37,6 +37,15 @@ public class ResourcePO {
     @Column(name = "bio")
     private String bio;
 
+    @Column(name = "code")
+    private String code;
+
+    @Column(name = "access_token")
+    private String accessToken;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     @Column(name = "is_deleted")
     private Integer isDeleted;
 }

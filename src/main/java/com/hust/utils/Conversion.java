@@ -53,7 +53,6 @@ public class Conversion {
     public static AppPO toAppPO(AuthorizeDTO authorizeDTO) {
         AppPO appPO = new AppPO();
         appPO.setRedirectUrl(authorizeDTO.getRedirect_url());
-        appPO.setState(authorizeDTO.getState());
         appPO.setClientId(authorizeDTO.getClient_id());
         return appPO;
     }
@@ -78,7 +77,6 @@ public class Conversion {
         AppPO appPO = new AppPO();
         appPO.setClientId(tokenDTO.getClient_id());
         appPO.setClientSecret(tokenDTO.getClient_secret());
-        appPO.setCode(tokenDTO.getCode());
         appPO.setRedirectUrl(tokenDTO.getRedirect_uri());
         return appPO;
     }

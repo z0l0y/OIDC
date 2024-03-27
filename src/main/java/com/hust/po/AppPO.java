@@ -31,18 +31,6 @@ public class AppPO {
     @Column(name = "redirect_url")
     private String redirectUrl;
 
-    @Column(name = "code")
-    private String code;
-
-    @Column(name = "state")
-    private String state;
-
-    @Column(name = "access_token")
-    private String accessToken;
-
-    @Column(name = "refresh_token")
-    private String refreshToken;
-
     @Column(name = "is_deleted")
     private Integer isDeleted;
 }

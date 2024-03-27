@@ -1,6 +1,8 @@
 package com.hust.controller;
 
 import com.hust.dto.VerifyDTO;
+import com.hust.pojo.Code;
+import com.hust.pojo.Token;
 import com.hust.service.ResourceService;
 import com.hust.utils.CodeUtils;
 import com.hust.utils.Result;
@@ -14,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.hust.utils.StorageUtils.storageCode;
+
 @RestController
 public class ResourceController {
     @Autowired
@@ -21,6 +25,7 @@ public class ResourceController {
 
     /**
      * 4，接下来这个接口是用来在GitHub（类似）页面跳转后的那个授权页面，就是那个有密码的，如果授权成功那么就会发放code
+     * 注意这里我们把code存在了resource_info里面，便于我们写后面的取数据的逻辑
      *
      * @param verifyDTO 存储的是用户的基本信息，比如username和password，由我们信任的资源服务器来接受我们的信息，这一块不在第三方进行
      * @return 验证用户信息成功后会发放code令牌，注意时效性
@@ -36,9 +41,20 @@ public class ResourceController {
             claims.put("code", uuidCode);
             String code = CodeUtils.generateCode(claims);
             String base64Code = Base64.getEncoder().encodeToString(code.getBytes());
+            Code storageCode = storageCode(verifyDTO, uuidCode);
+            resourceService.storageCode(storageCode);
             return Result.success(base64Code);
         } else {
             return Result.error("用户信息验证失败，授权失败！");
         }
     }
+
+    /**
+     * 使用访问令牌访问受保护资源
+     * @return
+     */
+/*    @PostMapping("/get/userInfo")
+    public Result getUserInfo(@RequestBody ){
+
+    }*/
 }

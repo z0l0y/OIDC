@@ -47,6 +47,7 @@ public class ClientController {
     /**
      * 3，验证 state 值，确保请求的完整性和安全性，然后再进一步验证用户的身份，通常通过用户登录、验证凭据等方式来确认用户的身份
      * 这里我们只能在这里来进行state的验证，毕竟只有我们的Client数据库里面存储的才是原始的state
+     * 这个接口的作用就是过滤一下非法的state，防止CSRF攻击，没有对数据库的增删改逻辑
      *
      * @param stateDTO 里面就只有一个state
      * @return state是否合法
