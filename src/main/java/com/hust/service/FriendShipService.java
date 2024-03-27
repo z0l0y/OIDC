@@ -11,4 +11,6 @@ public interface FriendShipService {
     Result agreeFriend(FriendDTO friendDTO);
 
     Result disagreeFriend(FriendDTO friendDTO);
+
+    Result notifyUser1(FriendDTO friendDTO);
 }

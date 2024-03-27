@@ -2,10 +2,7 @@ package com.hust.utils;
 
 import com.hust.dto.*;
 import com.hust.po.*;
-import com.hust.vo.CollectionVO;
-import com.hust.vo.FriendShipVO;
-import com.hust.vo.ResourceInfoVO;
-import com.hust.vo.UserVO;
+import com.hust.vo.*;
 
 public class Conversion {
     /**
@@ -128,6 +125,7 @@ public class Conversion {
 
     public static RatingPO toRatingPO(CollectDTO collectDTO) {
         RatingPO ratingPO = new RatingPO();
+        ratingPO.setUsername(collectDTO.getUsername());
         ratingPO.setRatingValue(collectDTO.getRatingValue());
         ratingPO.setAnimeName(collectDTO.getAnimeName());
         ratingPO.setCommentary(collectDTO.getCommentary());
@@ -147,4 +145,12 @@ public class Conversion {
         return friendShipVO;
     }
 
+    public static RatingVO toRatingVO(RatingPO ratingPO) {
+        RatingVO ratingVO = new RatingVO();
+        ratingVO.setAnimeName(ratingPO.getAnimeName());
+        ratingVO.setRatingValue(ratingPO.getRatingValue());
+        ratingVO.setCommentary(ratingPO.getCommentary());
+        ratingVO.setGmtModified(ratingPO.getGmtModified());
+        return ratingVO;
+    }
 }

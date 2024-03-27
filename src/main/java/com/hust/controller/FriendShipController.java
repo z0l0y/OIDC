@@ -47,4 +47,9 @@ public class FriendShipController {
     public Result disagreeFriend(@RequestBody FriendDTO friendDTO) {
         return friendShipService.disagreeFriend(friendDTO);
     }
+
+    @PostMapping("/notify")
+    public Result notifyUser1(@RequestBody FriendDTO friendDTO){
+        return friendShipService.notifyUser1(friendDTO);
+    }
 }
