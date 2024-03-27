@@ -7,13 +7,12 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import java.util.Map;
 
-public class JwtUtils {
-
+public class CodeUtils {
     private static final String signKey = "hust";
-    private static final Long expire = 43200000L;
+    private static final Long expire = 60 * 5L;
 
     //产生jwt令牌
-    public static String generateJwt(Map<String, Object> claims) {
+    public static String generateCode(Map<String, Object> claims) {
         String jwt = Jwts.builder()
                 .addClaims(claims)
                 .signWith(SignatureAlgorithm.HS256, signKey)
@@ -23,7 +22,7 @@ public class JwtUtils {
     }
 
     //解析令牌
-    public static Claims parseJWT(String jwt) {
+    public static Claims parseCode(String jwt) {
         Claims claims = Jwts.parser()
                 .setSigningKey(signKey)
                 .parseClaimsJws(jwt)
