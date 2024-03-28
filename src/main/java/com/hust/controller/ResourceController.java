@@ -59,11 +59,6 @@ public class ResourceController {
      */
     @PostMapping("/get/userInfo")
     public Result getUserInfo(@RequestBody AccessTokenDTO accessTokenDTO) {
-        Result userInfo = resourceService.getUserInfo(accessTokenDTO);
-        if (userInfo.getCode() == 1) {
-            return userInfo;
-        } else {
-            return Result.error("太久没有登录啦。请重新登录一下吧！");
-        }
+        return resourceService.getUserInfo(accessTokenDTO);
     }
 }

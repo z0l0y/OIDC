@@ -22,6 +22,7 @@ import java.util.UUID;
 import static com.hust.utils.AccessTokenUtils.parseAccessToken;
 import static com.hust.utils.CodeUtils.parseCode;
 import static com.hust.utils.Conversion.*;
+import static com.hust.utils.ExamineTokenExpire.examineToken;
 import static com.hust.utils.RefreshTokenUtils.parseRefreshToken;
 
 @Service
@@ -53,37 +54,50 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public Result getUserInfo(AccessTokenDTO accessTokenDTO) {
-        byte[] decodedBytes = new byte[0];
+        byte[] decodedBytes;
+        Claims claims1;
+        Claims claims2;
+        byte[] decodedRefreshToken;
+        String refreshToken;
         try {
             decodedBytes = Base64.getDecoder().decode(accessTokenDTO.getAccessToken());
-            String accessToken = new String(decodedBytes);
-            Claims claims = parseAccessToken(accessToken);
-            String token = (String) claims.get("accessToken");
+        } catch (RuntimeException e) {
+            return Result.error("请您不要恶意修改accessToken的信息!");
+        }
+        String accessToken1 = new String(decodedBytes);
+        // 阿里巴巴开发手册里面说过，要对try-catch负责，首先我们不能直接一大块全部try-catch，我们try-catch的颗粒度一定要细（精准try-catch），不能太粗了，其次是我们应该对try-catch部分发生的错误好好说明，对于前端的开发人员更加的友好
+        try {
+            claims1 = parseAccessToken(accessToken1);
+            String token = (String) claims1.get("accessToken");
             ResourcePO userInfo = resourceMapper.getUserInfo(token);
             ResourceInfoVO resourceInfoVO = toResourceInfoVO(userInfo);
             return Result.success(resourceInfoVO);
         } catch (RuntimeException e) {
             // AccessToken过期，尝试使用RefreshToken获取新的AccessToken
             try {
-                byte[] decodedRefreshToken = Base64.getDecoder().decode(accessTokenDTO.getRefreshToken());
-                // 使用RefreshToken获取新的AccessToken的逻辑
-                String refreshToken = new String(decodedRefreshToken);
-                Claims claims = parseRefreshToken(refreshToken);
-                String token = (String) claims.get("refreshToken");
-                // 获取到新的AccessToken后，继续下面的逻辑
-                Map<String, Object> newClaims = new HashMap<>();
-                String uuidAccessToken = UUID.randomUUID().toString().replace("-", "");
-                newClaims.put("accessToken", uuidAccessToken);
-                // 注意一下，这个是有两个.的JWT令牌，注意下面查询的时候不能用这个
-                String accessToken = AccessTokenUtils.generateAccessToken(newClaims);
-                resourceMapper.updateAccessToken(uuidAccessToken, token);
-                ResourcePO userInfo = resourceMapper.getUserInfo(uuidAccessToken);
-                ResourceInfoVO resourceInfoVO = toResourceInfoVO(userInfo);
-                return Result.success(resourceInfoVO);
-            } catch (RuntimeException refreshException) {
-                // RefreshToken过期，提示用户重新登录
-                return Result.error("太久没有登录啦。请重新登录一下吧！");
+                decodedRefreshToken = Base64.getDecoder().decode(accessTokenDTO.getRefreshToken());
+                refreshToken = new String(decodedRefreshToken);
+                claims2 = parseRefreshToken(refreshToken);
+            } catch (RuntimeException exception) {
+                return Result.error("请您不要恶意修改refreshToken的信息!");
             }
+            // 使用RefreshToken获取新的AccessToken的逻辑
+            try {
+                examineToken(refreshToken);
+            } catch (RuntimeException runtimeException) {
+                return Result.error("RefreshToken过期了，请您重新登录一下吧!");
+            }
+            String token = (String) claims2.get("refreshToken");
+            // 获取到新的AccessToken后，继续下面的逻辑
+            Map<String, Object> newClaims = new HashMap<>();
+            String uuidAccessToken = UUID.randomUUID().toString().replace("-", "");
+            newClaims.put("accessToken", uuidAccessToken);
+            // 注意一下，这个是有两个.的JWT令牌，注意下面查询的时候不能用这个
+            AccessTokenUtils.generateAccessToken(newClaims);
+            resourceMapper.updateAccessToken(uuidAccessToken, token);
+            ResourcePO userInfo = resourceMapper.getUserInfo(uuidAccessToken);
+            ResourceInfoVO resourceInfoVO = toResourceInfoVO(userInfo);
+            return Result.success(resourceInfoVO);
         }
     }
 }

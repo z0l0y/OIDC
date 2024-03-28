@@ -27,12 +27,17 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public Result verifyState(StateDTO stateDTO) {
         byte[] decodedBytes = new byte[0];
+        String state;
         try {
             decodedBytes = Base64.getDecoder().decode(stateDTO.getState());
-            String state = new String(decodedBytes);
+            state = new String(decodedBytes);
+        } catch (RuntimeException e) {
+            return Result.error("state被修改，检测到CSRF攻击!");
+        }
+        try {
             Claims claims = parseState(state);
         } catch (RuntimeException e) {
-            return Result.error("state已过期或无效，请重新进行授权验证！");
+            return Result.error("state已失效，请重新进行授权验证！");
         }
 
         StatePO statePO = clientMapper.verifyState(stateDTO.getState());

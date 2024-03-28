@@ -4,6 +4,7 @@ import com.hust.dto.AppDTO;
 import com.hust.dto.AuthorizeDTO;
 import com.hust.dto.TokenDTO;
 import com.hust.dto.StateDTO;
+import com.hust.pojo.IDToken;
 import com.hust.pojo.Token;
 import com.hust.service.AuthorizationService;
 import com.hust.utils.*;
@@ -12,12 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+import static com.hust.utils.CodeUtils.parseCode;
 import static com.hust.utils.ExamineTokenExpire.examineToken;
+import static com.hust.utils.IDTokenUtils.createIDToken;
+import static com.hust.utils.RefreshTokenUtils.parseRefreshToken;
 import static com.hust.utils.StorageUtils.storageToken;
 
 @RestController
@@ -59,7 +60,7 @@ public class AuthorizationController {
         if (authorize.getCode() == 1) {
             return Result.success("成功与授权服务器建立起连接！");
         } else {
-            return Result.error("用其他平台的账号登录失败！");
+            return Result.error("请不要随意修改URL上的信息，与授权服务器建立连接失败！");
         }
     }
 
@@ -80,14 +81,20 @@ public class AuthorizationController {
      */
     @PostMapping("/get/token")
     public Result getAccessToken(@RequestBody TokenDTO tokenDTO) {
-        byte[] decodedBytes = Base64.getDecoder().decode(tokenDTO.getCode());
-        String code = new String(decodedBytes);
+        String code = "";
+        try {
+            byte[] decodedBytes = Base64.getDecoder().decode(tokenDTO.getCode());
+            code = new String(decodedBytes);
+            parseCode(code);
+        } catch (RuntimeException e) {
+            return Result.error("code被恶意修改，请您重新授权！");
+        }
         Result result = new Result();
         try {
             result = examineToken(code);
         } catch (RuntimeException e) {
             e.printStackTrace();
-            return Result.error("您的code非法或已过期，请重新授权！");
+            return Result.error("您的code已过期，请重新授权！");
         }
         if (result.getCode() == 1) {
             Result verify = authorizationService.verifyClientInfo(tokenDTO);
@@ -102,17 +109,26 @@ public class AuthorizationController {
                 String base64AccessToken = Base64.getEncoder().encodeToString(accessToken.getBytes());
                 String base64RefreshToken = Base64.getEncoder().encodeToString(refreshToken.getBytes());
                 Map<String, Object> token = new HashMap<>();
-                token.put("accessToken",base64AccessToken);
-                token.put("refreshToken",base64RefreshToken);
+                token.put("access_token", base64AccessToken);
+                String iss = "https://auth.bangumi.com";
+                String sub = UUID.randomUUID().toString().replace("-", "");
+                String aud = tokenDTO.getClient_id();
+                Date iat = new Date(System.currentTimeMillis());
+                Date exp = new Date(System.currentTimeMillis() + 60 * 60 * 1000L);
+                String nonce = UUID.randomUUID().toString().replace("-", "");
+                String idToken = createIDToken(iss, sub, aud, exp, iat, nonce);
+                token.put("id_token", idToken);
+                token.put("token_type", "Bearer");
+                token.put("expires_in", 600000);
+                token.put("refresh_token", base64RefreshToken);
                 Token storageToken = storageToken(uuidAccessToken, uuidRefreshToken, tokenDTO.getCode());
                 authorizationService.storageToken(storageToken);
                 return Result.success(token);
             } else {
-                return Result.error("URL错误，请检查！");
+                return Result.error("请检查您的客户端ID和客户端密钥是否正确！");
             }
         } else {
-            return Result.error("code非法！");
+            return Result.error("code非法，请重新授权！");
         }
     }
-
 }

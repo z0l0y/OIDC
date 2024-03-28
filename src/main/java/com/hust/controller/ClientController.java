@@ -59,7 +59,7 @@ public class ClientController {
         if (verifyState.getCode() == 1) {
             return Result.success("state验证成功，现在可以跳转到用户身份验证的阶段了！");
         } else {
-            return Result.error("state失效，请重新操作！");
+            return verifyState;
         }
     }
 

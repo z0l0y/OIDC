@@ -20,9 +20,9 @@ public class ExamineTokenExpire {
         boolean isExpired = expirationDate.getTime() < System.currentTimeMillis();
 
         if (isExpired) {
-            return Result.error("JWT 令牌已过期");
+            return Result.error("JWT令牌已过期");
         } else {
-            return Result.success("JWT 令牌仍然有效");
+            return Result.success("JWT令牌仍然有效");
         }
     }
 }
