@@ -7,6 +7,7 @@ import com.hust.pojo.Token;
 import com.hust.service.ResourceService;
 import com.hust.utils.CodeUtils;
 import com.hust.utils.Result;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.hust.utils.IDTokenUtils.parseIDToken;
 import static com.hust.utils.StorageUtils.storageCode;
 
 @RestController
@@ -71,31 +73,31 @@ public class ResourceController {
     /**
      * 6.目前看来就只有state是在第三方得到的，其他的逻辑都在我们信任的资源服务器和授权服务器这边，现在看来确实安全很多
      * 最后一步，就是解析获取到的Base64编码，得到token进行了（除了client_state，其他的都是在我们这边的表，所以第三方也只能拿到state数据，其他的都是拿不到的，所以很安全）
+     * <p>
+     * 第5步获取到的token（Base64编码格式）
      *
-     * @param accessTokenDTO 第5步获取到的token（Base64编码格式）
      * @return 用户的信息
      */
-    @PostMapping("/get/userInfo")
+/*    @PostMapping("/get/userInfo")
     public Result getUserInfo(@RequestBody AccessTokenDTO accessTokenDTO) {
         return resourceService.getUserInfo(accessTokenDTO);
-    }
-
+    }*/
     @GetMapping("/userinfo")
     public Result userinfo(@RequestHeader("Authorization") String authorizationHeader) {
         String accessToken;
         String refreshToken;
+        String idToken = "";
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
             String[] tokens = authorizationHeader.split(",");
-            if (tokens.length == 2) {
+            if (tokens.length == 3) {
                 accessToken = tokens[0].replace("Bearer", "").trim();
-                System.out.println(accessToken);
                 refreshToken = tokens[1].replace("RefreshToken", "").trim();
-                System.out.println(refreshToken);
+                idToken = tokens[2].replace("IDToken", "").trim();
                 accessTokenDTO.setAccessToken(accessToken);
                 accessTokenDTO.setRefreshToken(refreshToken);
             }
         }
-        return resourceService.getUserInfo(accessTokenDTO);
+        return resourceService.getUserInfo(accessTokenDTO, idToken);
     }
 }

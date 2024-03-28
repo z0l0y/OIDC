@@ -46,6 +46,9 @@ public class ResourcePO {
     @Column(name = "refresh_token")
     private String refreshToken;
 
+    @Column(name = "scope")
+    private String scope;
+
     @Column(name = "is_deleted")
     private Integer isDeleted;
 }

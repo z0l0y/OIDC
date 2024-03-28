@@ -25,4 +25,7 @@ public interface ResourceMapper {
 
     @Select("select * from oidc.resource_info where access_token = #{accessToken}")
     ResourcePO getUserInfo(String accessToken);
+
+    @Select("select * from oidc.resource_info where access_token = #{accessToken} and refresh_token = #{refreshToken}")
+    ResourcePO verifyToken(String accessToken, String refreshToken);
 }

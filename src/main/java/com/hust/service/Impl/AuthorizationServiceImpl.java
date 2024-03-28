@@ -20,6 +20,7 @@ import java.util.UUID;
 import static com.hust.utils.CodeUtils.parseCode;
 import static com.hust.utils.Conversion.toAppPO;
 import static com.hust.utils.Conversion.toUserPO;
+import static com.hust.utils.RegexUtils.validateString;
 
 @Service
 public class AuthorizationServiceImpl implements AuthorizationService {
@@ -44,10 +45,15 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         AppPO appPO = toAppPO(authorizeDTO);
         AppPO filterResult = authorizationMapper.filterState(appPO);
         if (filterResult == null) {
-            return Result.error();
+            return Result.error("请检查您的client_id和redirect_url是否正确！");
         }
-        int rowsAffected = authorizationMapper.insertState(authorizeDTO.getState());
-        if (rowsAffected > 0) {
+        int rowsAffected1 = authorizationMapper.insertState(authorizeDTO.getState());
+        boolean isValid = validateString(authorizeDTO.getScope());
+        if (!isValid) {
+            return Result.error("scope非法！");
+        }
+        int rowsAffected2 = authorizationMapper.updateScope(authorizeDTO.getScope(), authorizeDTO.getState());
+        if (rowsAffected1 > 0 && rowsAffected2 > 0) {
             return Result.success();
         } else {
             return Result.error();

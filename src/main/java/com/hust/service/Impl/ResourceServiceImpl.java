@@ -23,6 +23,7 @@ import static com.hust.utils.AccessTokenUtils.parseAccessToken;
 import static com.hust.utils.CodeUtils.parseCode;
 import static com.hust.utils.Conversion.*;
 import static com.hust.utils.ExamineTokenExpire.examineToken;
+import static com.hust.utils.IDTokenUtils.parseIDToken;
 import static com.hust.utils.RefreshTokenUtils.parseRefreshToken;
 
 @Service
@@ -53,7 +54,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public Result getUserInfo(AccessTokenDTO accessTokenDTO) {
+    public Result getUserInfo(AccessTokenDTO accessTokenDTO, String idToken) {
         byte[] decodedBytes;
         Claims claims1;
         Claims claims2;
@@ -87,6 +88,10 @@ public class ResourceServiceImpl implements ResourceService {
             } catch (RuntimeException runtimeException) {
                 return Result.error("RefreshToken过期了，请您重新登录一下吧!");
             }
+            ResourcePO rowsAffected = resourceMapper.verifyToken(accessToken1, refreshToken);
+            if (rowsAffected == null) {
+                return Result.error("accessToken和refreshToken已经过时，请换新的Token发起请求！");
+            }
             String token = (String) claims2.get("refreshToken");
             // 获取到新的AccessToken后，继续下面的逻辑
             Map<String, Object> newClaims = new HashMap<>();
@@ -97,7 +102,19 @@ public class ResourceServiceImpl implements ResourceService {
             resourceMapper.updateAccessToken(uuidAccessToken, token);
             ResourcePO userInfo = resourceMapper.getUserInfo(uuidAccessToken);
             ResourceInfoVO resourceInfoVO = toResourceInfoVO(userInfo);
-            return Result.success(resourceInfoVO);
+            Claims claims = parseIDToken(idToken);
+            HashMap<Object, Object> map = new HashMap<>();
+            String scope = new String();
+            if (scope.contains("openid")) {
+                map.put("openid", claims);
+            }
+            if (scope.contains("email")) {
+                map.put("email", resourceInfoVO.getEmail());
+            }
+            if (scope.contains("profile")) {
+                map.put("profile", toProfileVO(resourceInfoVO));
+            }
+            return Result.success(map);
         }
     }
 }

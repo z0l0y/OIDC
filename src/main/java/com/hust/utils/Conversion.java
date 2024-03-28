@@ -3,6 +3,7 @@ package com.hust.utils;
 import com.hust.dto.*;
 import com.hust.po.*;
 import com.hust.vo.*;
+import org.ini4j.Profile;
 import org.springframework.web.bind.annotation.RequestParam;
 
 public class Conversion {
@@ -163,5 +164,13 @@ public class Conversion {
         authorizeDTO.setScope(scope);
         authorizeDTO.setState(state);
         return authorizeDTO;
+    }
+
+    public static ProfileVO toProfileVO(ResourceInfoVO resourceInfoVO){
+        ProfileVO profileVO = new ProfileVO();
+        profileVO.setUsername(resourceInfoVO.getUsername());
+        profileVO.setNickname(resourceInfoVO.getNickname());
+        profileVO.setAvatar(resourceInfoVO.getAvatar());
+        return profileVO;
     }
 }

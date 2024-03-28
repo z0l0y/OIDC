@@ -10,5 +10,5 @@ public interface ResourceService {
 
     Result storageCode(Code code);
 
-    Result getUserInfo(AccessTokenDTO accessTokenDTO);
+    Result getUserInfo(AccessTokenDTO accessTokenDTO, String idToken);
 }

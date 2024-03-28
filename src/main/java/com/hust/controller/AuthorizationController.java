@@ -68,9 +68,12 @@ public class AuthorizationController {
         Result authorize = authorizationService.authorize(authorizeDTO);
         if (authorize.getCode() == 1) {
             return Result.success("成功与授权服务器建立起连接！");
+        } else if (authorize.getData() != null) {
+            return authorize;
         } else {
             return Result.error("请不要随意修改URL上的信息，与授权服务器建立连接失败！");
         }
+
     }
 
 
@@ -120,7 +123,7 @@ public class AuthorizationController {
                 String base64RefreshToken = Base64.getEncoder().encodeToString(refreshToken.getBytes());
                 Map<String, Object> token = new HashMap<>();
                 token.put("access_token", base64AccessToken);
-                String iss = "https://auth.bangumi.com";
+                String iss = "http://localhost:8080/authorize";
                 String sub = UUID.randomUUID().toString().replace("-", "");
                 String aud = tokenDTO.getClient_id();
                 Date iat = new Date(System.currentTimeMillis());

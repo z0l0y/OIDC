@@ -17,6 +17,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 public class ClientController {
@@ -26,7 +27,6 @@ public class ClientController {
 
     /**
      * 2.1，客户端将用户重定向到授权服务器，获取到客户端生成的state参数作为自己URL的一部分
-     *
      */
     @GetMapping("/get/state")
     public Result getState() {
@@ -62,4 +62,26 @@ public class ClientController {
         }
     }
 
+    private Map<String, Object> map = new HashMap<>();
+
+    private int flag = 0;
+
+    @GetMapping("/well-known/openid-configuration")
+    public Map<String, Object> showOpenidConfiguration() {
+        if (flag == 0) {
+            // 如果缓存中不存在数据，则进行数据的生成和缓存
+            map.put("issuer", new String[]{"http://localhost:8080/authorize"});
+            map.put("authorization_endpoint", new String[]{"http://localhost:8080/verify/user/identity"});
+            map.put("token_endpoint", new String[]{"http://localhost:8080/token"});
+            map.put("userinfo_endpoint", new String[]{"http://localhost:8080/userinfo"});
+            map.put("response_types_supported", new String[]{"code", "access_token", "refresh_token", "id_token"});
+            map.put("id_token_signing_alg_values_supported", new String[]{"HS256"});
+            map.put("scopes_supported", new String[]{"openid", "email", "profile"});
+            map.put("claims_supported", new String[]{"sub", "username", "email", "nickname", "avatar", "bio"});
+            map.put("grant_types_supported", new String[]{"authorization_code", "refresh_token"});
+            flag++;
+        }
+        return map;
+    }
 }
+

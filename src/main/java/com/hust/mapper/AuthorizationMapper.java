@@ -21,6 +21,9 @@ public interface AuthorizationMapper {
     @Insert("insert into authorization_state (state) values (#{state})")
     int insertState(String state);
 
+    @Insert("update authorization_state set scope = #{scope} where state = #{state}")
+    int updateScope(String scope, String state);
+
     @Select("select * from oidc.client_info where client_id = #{clientId} and client_secret = #{clientSecret}")
     AppPO verifyClient(AppPO appPO);
 
