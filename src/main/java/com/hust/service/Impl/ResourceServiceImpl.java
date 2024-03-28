@@ -74,9 +74,10 @@ public class ResourceServiceImpl implements ResourceService {
                 Map<String, Object> newClaims = new HashMap<>();
                 String uuidAccessToken = UUID.randomUUID().toString().replace("-", "");
                 newClaims.put("accessToken", uuidAccessToken);
+                // 注意一下，这个是有两个.的JWT令牌，注意下面查询的时候不能用这个
                 String accessToken = AccessTokenUtils.generateAccessToken(newClaims);
                 resourceMapper.updateAccessToken(uuidAccessToken, token);
-                ResourcePO userInfo = resourceMapper.getUserInfo(accessToken);
+                ResourcePO userInfo = resourceMapper.getUserInfo(uuidAccessToken);
                 ResourceInfoVO resourceInfoVO = toResourceInfoVO(userInfo);
                 return Result.success(resourceInfoVO);
             } catch (RuntimeException refreshException) {

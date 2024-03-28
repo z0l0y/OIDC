@@ -54,6 +54,7 @@ public class ClientController {
      */
     @PostMapping("/verify/state")
     public Result verifyState(@RequestBody StateDTO stateDTO) {
+        // 单纯的用JWT返回的格式有一点奇怪，有.，很明显就是JWT，为了掩盖一下，我采用了Base64来先编码一下
         Result verifyState = clientService.verifyState(stateDTO);
         if (verifyState.getCode() == 1) {
             return Result.success("state验证成功，现在可以跳转到用户身份验证的阶段了！");
