@@ -9,13 +9,16 @@ import com.hust.pojo.Token;
 import com.hust.service.AuthorizationService;
 import com.hust.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.*;
 
 import static com.hust.utils.CodeUtils.parseCode;
+import static com.hust.utils.Conversion.toAuthorizeDTO;
 import static com.hust.utils.ExamineTokenExpire.examineToken;
 import static com.hust.utils.IDTokenUtils.createIDToken;
 import static com.hust.utils.RefreshTokenUtils.parseRefreshToken;
@@ -47,14 +50,20 @@ public class AuthorizationController {
     }
 
     /**
-     * ，2.2，然后，用户点击用其他平台的账号登录才能调用这样一个接口，用于在我们的授权服务器里面存储好state，便于防范CSRF攻击
+     * 已规范！
+     * 2.2，然后，用户点击用其他平台的账号登录才能调用这样一个接口，用于在我们的授权服务器里面存储好state，便于防范CSRF攻击
      * 注意前端应该先调用我们ClientController的方法，产生一个state后才能调用这个方法，将state加到URL里面
+     * 类似于用GitHub，刚进去的时候的页面上面的URL，发这个请求的目的是将Client生成的state存储起来
      *
-     * @param authorizeDTO 类似于用GitHub，刚进去的时候的页面上面的URL，发这个请求的目的是将Client生成的state存储起来
      * @return 进入页面是否成功
      */
-    @PostMapping("/login/oauth/authorize")
-    public Result authorizeMyApp(@RequestBody AuthorizeDTO authorizeDTO) {
+    @GetMapping("/authorize")
+    public Result authorizeMyApp(@RequestParam("response_type") String responseType,
+                                 @RequestParam("client_id") String clientId,
+                                 @RequestParam("redirect_url") String redirectUrl,
+                                 @RequestParam("scope") String scope,
+                                 @RequestParam("state") String state) {
+        AuthorizeDTO authorizeDTO = toAuthorizeDTO(responseType, clientId, redirectUrl, scope, state);
         // 插入从这个请求中获取到的state参数，便于我们后期进行比对
         Result authorize = authorizationService.authorize(authorizeDTO);
         if (authorize.getCode() == 1) {
@@ -74,12 +83,13 @@ public class AuthorizationController {
     */
 
     /**
+     * 参数一致！
      * 5，在我们的授权服务器发放code之后，就可以完全在我们的后端来处理逻辑了，注意token的时效性，首先要验证然后才能进行下面的逻辑
      *
      * @param tokenDTO 包含了我们刚才获取到的code，还有第三方的client_id和client_secret，准备获取access_token去资源服务器获取我们的数据然后给第三方了！
      * @return 返回access token和refresh token，同样注意时效性
      */
-    @PostMapping("/get/token")
+    @PostMapping("/token")
     public Result getAccessToken(@RequestBody TokenDTO tokenDTO) {
         String code = "";
         try {
@@ -131,4 +141,43 @@ public class AuthorizationController {
             return Result.error("code非法，请重新授权！");
         }
     }
+
+/*
+    @GetMapping("/oauth2")
+    public void handleOAuth2Response(@RequestParam("code") String code,
+                                     @RequestParam("state") String state,
+                                     HttpServletResponse response) throws IOException {
+        // 处理授权码和状态的逻辑
+        // ...
+
+        String redirectUri = "https://client.example.com/redirect"; // 客户端提供的redirect_uri
+        String encodedCode = URLEncoder.encode(code, "UTF-8");
+        String encodedState = URLEncoder.encode(state, "UTF-8");
+
+        // 构建重定向URL，包含授权码和状态
+        String redirectLocation = redirectUri + "?code=" + encodedCode + "&state=" + encodedState;
+
+        // 重定向到客户端提供的redirect_uri
+        response.setStatus(HttpStatus.FOUND.value());
+        response.setHeader("Location", redirectLocation);
+    }*/
+
+/*    @GetMapping("/oauth2")
+    public void handleOAuth2Response(HttpServletResponse response) throws IOException {
+        // 获取授权码和state
+        String code = "SplxlOBeZQQYbYS6WxSbIA";
+        String state = "xyz";
+
+        // 构建重定向URL
+        String redirectUri = "https://client.example.com/oauth2";
+        String encodedCode = URLEncoder.encode(code, "UTF-8");
+        String encodedState = URLEncoder.encode(state, "UTF-8");
+        String redirectLocation = redirectUri + "?code=" + encodedCode + "&state=" + encodedState;
+
+        // 设置响应状态码和Location头部信息
+        response.setStatus(HttpStatus.FOUND.value());
+        response.setHeader("Location", redirectLocation);
+    }*/
 }
+
+

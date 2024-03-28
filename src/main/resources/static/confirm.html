@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>确认授权</title>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+</head>
+<body>
+<div id="app">
+    <h1>确认授权</h1>
+    <p>您是否同意授权以下权限：</p>
+    <ul>
+        <li>访问您的基本信息</li>
+        <li>访问您的联系方式</li>
+    </ul>
+    <form @submit.prevent="requestAuthorization">
+        <label>
+            <input type="checkbox" v-model="consent" required>
+            我同意授权
+        </label>
+        <br>
+        <button type="submit">确认</button>
+    </form>
+</div>
+
+<script>
+    // 创建 Vue 实例
+    var app = new Vue({
+        el: '#app',
+        data: {
+            consent: false,
+            stateValue: ''
+        },
+        methods: {
+            requestAuthorization: function() {
+                // 在这里使用 this.stateValue 获取最新的 state 值
+                var stateValue = this.stateValue;
+
+                // 发起验证请求
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "http://localhost:8080/verify/state");
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            var verifyStateResponse = JSON.parse(xhr.responseText);
+                            if (verifyStateResponse.code === 1) {
+                                // 重定向到授权请求URL
+                                window.location.href = "http://localhost:63342/OIDC/static/authorization.html";
+                            } else {
+                                // 处理 verifyState 请求失败的情况
+                            }
+                        } else {
+                            // 处理 verifyState 请求失败的情况
+                        }
+                    }
+                };
+            }
+        }
+    });
+
+    // 创建并配置路由
+    var router = new VueRouter({
+        mode: 'history', // 使用 HTML5 History 模式
+        routes: [
+            {
+                path: '/authorization',
+                component: {
+                    template: '<div></div>',
+                    beforeRouteEnter: function(to, from, next) {
+                        // 在路由进入前获取 state 值并传递给 Vue 实例
+                        app.stateValue = to.query.state;
+                        next();
+                    }
+                }
+            }
+        ]
+    });
+
+    // 将路由挂载到 Vue 实例
+    app.$mount('#app');
+</script>
+</body>
+</html>

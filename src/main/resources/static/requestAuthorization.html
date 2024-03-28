@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>请求授权</title>
+  <meta charset="UTF-8">
+  <script>
+    function requestAuthorization() {
+      // 发起GET请求获取state参数
+      fetch('http://localhost:8080/get/state')
+              .then(response => response.json())
+              .then(data => {
+                const state = data.data;
+
+                // 客户端提供的参数
+                var response_type = "code";
+                var client_id = "c556723844614ec2a13a270cc8847fc8";
+                var redirect_uri = "http://localhost:63342/OIDC/static/authorization.html";
+                var scope = "openid%20profile";
+
+                // 构建授权请求URL
+                var authorizationUrl = "http://localhost:63342/OIDC/static/confirm.html" +
+                        "?response_type=" + encodeURIComponent(response_type) +
+                        "&client_id=" + encodeURIComponent(client_id) +
+                        "&state=" + encodeURIComponent(state) +
+                        "&redirect_uri=" + encodeURIComponent(redirect_uri) +
+                        "&scope=" + encodeURIComponent(scope);
+
+                // 重定向到授权请求URL
+                window.location.href = authorizationUrl;
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+    }
+  </script>
+</head>
+<body>
+<h1>没有账号？</h1>
+<button onclick="requestAuthorization()">通过其他方式登录bangumi</button>
+</body>
+</html>

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Base64;
 
 import static com.hust.utils.AccessTokenUtils.parseAccessToken;
+import static com.hust.utils.ExamineTokenExpire.examineToken;
 import static com.hust.utils.StateUtils.parseState;
 
 @Service
@@ -31,11 +32,12 @@ public class ClientServiceImpl implements ClientService {
         try {
             decodedBytes = Base64.getDecoder().decode(stateDTO.getState());
             state = new String(decodedBytes);
+            Claims claims = parseState(state);
         } catch (RuntimeException e) {
             return Result.error("state被修改，检测到CSRF攻击!");
         }
         try {
-            Claims claims = parseState(state);
+            examineToken(state);
         } catch (RuntimeException e) {
             return Result.error("state已失效，请重新进行授权验证！");
         }

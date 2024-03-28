@@ -3,6 +3,7 @@ package com.hust.utils;
 import com.hust.dto.*;
 import com.hust.po.*;
 import com.hust.vo.*;
+import org.springframework.web.bind.annotation.RequestParam;
 
 public class Conversion {
     /**
@@ -152,5 +153,15 @@ public class Conversion {
         ratingVO.setCommentary(ratingPO.getCommentary());
         ratingVO.setGmtModified(ratingPO.getGmtModified());
         return ratingVO;
+    }
+
+    public static AuthorizeDTO toAuthorizeDTO(String responseType, String clientId, String redirectUrl, String scope, String state) {
+        AuthorizeDTO authorizeDTO = new AuthorizeDTO();
+        authorizeDTO.setResponse_type(responseType);
+        authorizeDTO.setClient_id(clientId);
+        authorizeDTO.setRedirect_url(redirectUrl);
+        authorizeDTO.setScope(scope);
+        authorizeDTO.setState(state);
+        return authorizeDTO;
     }
 }

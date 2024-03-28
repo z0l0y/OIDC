@@ -27,7 +27,6 @@ public class ClientController {
     /**
      * 2.1，客户端将用户重定向到授权服务器，获取到客户端生成的state参数作为自己URL的一部分
      *
-     * @return
      */
     @GetMapping("/get/state")
     public Result getState() {

@@ -8,10 +8,14 @@ import com.hust.service.ResourceService;
 import com.hust.utils.CodeUtils;
 import com.hust.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,11 +33,9 @@ public class ResourceController {
      * 注意这里我们把code存在了resource_info里面，便于我们写后面的取数据的逻辑
      *
      * @param verifyDTO 存储的是用户的基本信息，比如username和password，由我们信任的资源服务器来接受我们的信息，这一块不在第三方进行
-     * @return 验证用户信息成功后会发放code令牌，注意时效性
      */
     @PostMapping("/verify/user/identity")
-    public Result verifyUserIdentity(@RequestBody VerifyDTO verifyDTO) {
-        // 你在这里不搞，那么我们等下得到access token之后要取哪一个用户的数据呢？是不是有一点拔剑四顾心茫然啊
+    public Result verifyUserIdentity(@RequestBody VerifyDTO verifyDTO, HttpServletResponse response) throws IOException {
         Result verifyPass = resourceService.verifyIdentity(verifyDTO);
         if (verifyPass.getCode() == 1) {
             // 登录成功，生成令牌，下发令牌
@@ -48,6 +50,22 @@ public class ResourceController {
         } else {
             return Result.error("用户信息验证失败，授权失败！");
         }
+/*            // 构建重定向URL，注意一下，重定向的过程中，前端页面不一定要显示出来
+            String redirectUri = "http://localhost:8080/token";
+            String encodedCode = URLEncoder.encode(base64Code, StandardCharsets.UTF_8);
+            String redirectLocation = redirectUri + "?code=" + encodedCode;
+
+            // 设置Content-Type头部信息
+            response.setContentType("application/json");
+
+            // 进行重定向
+            response.sendRedirect(redirectLocation);
+        } else {
+            // 处理验证失败情况
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            // 返回错误信息给客户端
+            response.getWriter().write("用户信息验证失败，授权失败！");
+        }*/
     }
 
     /**
@@ -59,6 +77,25 @@ public class ResourceController {
      */
     @PostMapping("/get/userInfo")
     public Result getUserInfo(@RequestBody AccessTokenDTO accessTokenDTO) {
+        return resourceService.getUserInfo(accessTokenDTO);
+    }
+
+    @GetMapping("/userinfo")
+    public Result userinfo(@RequestHeader("Authorization") String authorizationHeader) {
+        String accessToken;
+        String refreshToken;
+        AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
+            String[] tokens = authorizationHeader.split(",");
+            if (tokens.length == 2) {
+                accessToken = tokens[0].replace("Bearer", "").trim();
+                System.out.println(accessToken);
+                refreshToken = tokens[1].replace("RefreshToken", "").trim();
+                System.out.println(refreshToken);
+                accessTokenDTO.setAccessToken(accessToken);
+                accessTokenDTO.setRefreshToken(refreshToken);
+            }
+        }
         return resourceService.getUserInfo(accessTokenDTO);
     }
 }
