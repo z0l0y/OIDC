@@ -9,6 +9,9 @@ import org.hibernate.validator.constraints.ru.INN;
 
 @Mapper
 public interface ClientMapper {
+    @Select("select * from oidc.client_state where state = #{state}")
+    Object verify(String state);
+
     @Insert("insert into client_state (state) values (#{state})")
     void storeState(String state);
 

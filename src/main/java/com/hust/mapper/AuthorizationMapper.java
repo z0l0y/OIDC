@@ -18,6 +18,9 @@ public interface AuthorizationMapper {
     @Select("select * from oidc.client_info where client_id = #{clientId} and redirect_url = #{redirectUrl}")
     AppPO filterState(AppPO appPO);
 
+    @Select("select * from oidc.authorization_state where state = #{state}")
+    Object verifyStateExistence(String state);
+
     @Insert("insert into authorization_state (state) values (#{state})")
     int insertState(String state);
 
@@ -32,4 +35,10 @@ public interface AuthorizationMapper {
 
     @Update("update resource_info set access_token = #{accessToken}, refresh_token = #{refreshToken} where code= #{code}")
     int updateToken(Token token);
+
+    @Update("update resource_info set scope = #{scope} where username = #{username} and password = #{password}")
+    int updateUserScope(String username, String password, String scope);
+
+    @Select("select * from oidc.resource_info where username = #{username} and password = #{password}")
+    ResourcePO getUserProfile(String username, String password);
 }

@@ -15,11 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.UUID;
 
 import static com.hust.utils.CodeUtils.parseCode;
-import static com.hust.utils.Conversion.toAppPO;
-import static com.hust.utils.Conversion.toUserPO;
+import static com.hust.utils.Conversion.*;
 import static com.hust.utils.RegexUtils.validateString;
 
 @Service
@@ -46,6 +46,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         AppPO filterResult = authorizationMapper.filterState(appPO);
         if (filterResult == null) {
             return Result.error("请检查您的client_id和redirect_url是否正确！");
+        }
+        if (authorizationMapper.verifyStateExistence(authorizeDTO.getState()) != null) {
+            return Result.success();
         }
         int rowsAffected1 = authorizationMapper.insertState(authorizeDTO.getState());
         boolean isValid = validateString(authorizeDTO.getScope());
@@ -87,5 +90,21 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         } else {
             return Result.error();
         }
+    }
+
+    @Override
+    public HashMap<Object, Object> getUserInfo(String name, String password, String scope) {
+        HashMap<Object, Object> map = new HashMap<>();
+        authorizationMapper.updateUserScope(name, password, scope);
+        ResourcePO userProfile = authorizationMapper.getUserProfile(name, password);
+        if (scope.contains("openid")) {
+        }
+        if (scope.contains("email")) {
+            map.put("email", userProfile.getEmail());
+        }
+        if (scope.contains("profile")) {
+            map.put("profile", toProfileVO(userProfile));
+        }
+        return map;
     }
 }

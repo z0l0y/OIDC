@@ -1,16 +1,16 @@
 package com.hust.controller;
 
-import com.hust.dto.AppDTO;
-import com.hust.dto.AuthorizeDTO;
-import com.hust.dto.TokenDTO;
-import com.hust.dto.StateDTO;
+import com.hust.dto.*;
 import com.hust.pojo.IDToken;
 import com.hust.pojo.Token;
 import com.hust.service.AuthorizationService;
 import com.hust.utils.*;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -21,6 +21,7 @@ import static com.hust.utils.CodeUtils.parseCode;
 import static com.hust.utils.Conversion.toAuthorizeDTO;
 import static com.hust.utils.ExamineTokenExpire.examineToken;
 import static com.hust.utils.IDTokenUtils.createIDToken;
+import static com.hust.utils.JwtUtils.parseJWT;
 import static com.hust.utils.RefreshTokenUtils.parseRefreshToken;
 import static com.hust.utils.StorageUtils.storageToken;
 
@@ -32,7 +33,7 @@ public class AuthorizationController {
     private static final String AUTHORIZATION_SUCCESS = "申请授权第三方成功！";
 
     /**
-     * 1，首先你这个第三方要在我授权服务器上面注册你的相关信息，顺便放回给你一个唯一的Client_id
+     * 0，首先你这个第三方要在我授权服务器上面注册你的相关信息，顺便放回给你一个唯一的Client_id
      *
      * @param appDTO
      * @return
@@ -51,23 +52,70 @@ public class AuthorizationController {
 
     /**
      * 已规范！
-     * 2.2，然后，用户点击用其他平台的账号登录才能调用这样一个接口，用于在我们的授权服务器里面存储好state，便于防范CSRF攻击
+     * 1，然后，用户点击用其他平台的账号登录才能调用这样一个接口，用于在我们的授权服务器里面存储好state，便于防范CSRF攻击
      * 注意前端应该先调用我们ClientController的方法，产生一个state后才能调用这个方法，将state加到URL里面
-     * 类似于用GitHub，刚进去的时候的页面上面的URL，发这个请求的目的是将Client生成的state存储起来
+     * 类似于用GitHub，刚进去的时候的页面上面的URL
+     * 发这个请求的目的是将Client生成的state存储起来，存到我们的授权服务器，authorization_state里面
      *
      * @return 进入页面是否成功
      */
     @GetMapping("/authorize")
-    public Result authorizeMyApp(@RequestParam("response_type") String responseType,
+    public Object authorizeMyApp(@RequestParam("response_type") String responseType,
                                  @RequestParam("client_id") String clientId,
                                  @RequestParam("redirect_url") String redirectUrl,
                                  @RequestParam("scope") String scope,
-                                 @RequestParam("state") String state) {
+                                 @RequestParam("state") String state,
+                                 @RequestHeader("Authorization") String authorizationHeader) {
+/*        // 调用 /verify/state 接口
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8080/verify/state";
+        StateDTO stateDTO = new StateDTO();
+        stateDTO.setState(state);
+        Result verifyStateResult = restTemplate.postForObject(url, stateDTO, Result.class);
+        if (verifyStateResult.getCode() == 0) {
+            return verifyStateResult;
+        }*/
         AuthorizeDTO authorizeDTO = toAuthorizeDTO(responseType, clientId, redirectUrl, scope, state);
         // 插入从这个请求中获取到的state参数，便于我们后期进行比对
         Result authorize = authorizationService.authorize(authorizeDTO);
         if (authorize.getCode() == 1) {
-            return Result.success("成功与授权服务器建立起连接！");
+/*
+            // 构建请求参数
+            VerifyDTO verifyDTO = new VerifyDTO();
+            // 设置 verifyDTO 的参数
+
+            // 发起 POST 请求重定向到 /authenticate 接口
+            RestTemplate restTemplate = new RestTemplate();
+            String authenticateUrl = "http://localhost:8080/authenticate";  // 替换为实际的 /authenticate 接口的 URL
+            Result verifyPass = restTemplate.postForObject(authenticateUrl, verifyDTO, Result.class);
+*/
+            Claims claims;
+            try {
+                // 提取JWT令牌的内容
+                String token = authorizationHeader.substring(7); // 去除"Bearer "前缀
+                claims = parseJWT(token);
+            } catch (RuntimeException e) {
+                return Result.error("请您重新登录bangumoe,登录的token已过期");
+            }
+            String username = (String) claims.get("username");
+            String password = (String) claims.get("password");
+            HashMap<Object, Object> userInfo = authorizationService.getUserInfo(username, password, scope);
+
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "http://localhost:8080/authenticate";
+            VerifyDTO verifyDTO = new VerifyDTO();
+            verifyDTO.setUsername(username);
+            verifyDTO.setPassword(password);
+            Result verifyStateResult = restTemplate.postForObject(url, verifyDTO, Result.class);
+            if (verifyStateResult.getCode() == 0) {
+                return verifyStateResult;
+            }
+            HashMap<Object, Object> map = new HashMap<>();
+            map.put("userInfo", userInfo);
+            map.put("code", verifyStateResult.getData());
+            map.put("state", state);
+
+            return Result.success(map);
         } else if (authorize.getData() != null) {
             return authorize;
         } else {
@@ -87,7 +135,7 @@ public class AuthorizationController {
 
     /**
      * 参数一致！
-     * 5，在我们的授权服务器发放code之后，就可以完全在我们的后端来处理逻辑了，注意token的时效性，首先要验证然后才能进行下面的逻辑
+     * 3，在我们的授权服务器发放code之后，就可以完全在我们的后端来处理逻辑了，注意token的时效性，首先要验证然后才能进行下面的逻辑
      *
      * @param tokenDTO 包含了我们刚才获取到的code，还有第三方的client_id和client_secret，准备获取access_token去资源服务器获取我们的数据然后给第三方了！
      * @return 返回access token和refresh token，同样注意时效性

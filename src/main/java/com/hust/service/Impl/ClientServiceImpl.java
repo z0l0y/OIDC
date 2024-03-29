@@ -22,6 +22,11 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void storeState(String state) {
+        // 避免存储重复的state
+        Object existence = clientMapper.verify(state);
+        if (existence != null) {
+            return;
+        }
         clientMapper.storeState(state);
     }
 

@@ -4,7 +4,6 @@
     <title>确认授权</title>
     <meta charset="UTF-8">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
 </head>
 <body>
 <div id="app">
@@ -29,8 +28,7 @@
     var app = new Vue({
         el: '#app',
         data: {
-            consent: false,
-            stateValue: ''
+            consent: false
         },
         methods: {
             requestAuthorization: function() {
@@ -56,30 +54,13 @@
                         }
                     }
                 };
+
+                // 将 state 参数作为 POST 请求的参数
+                var requestBody = JSON.stringify({ state: stateValue });
+                xhr.send(requestBody);
             }
         }
     });
-
-    // 创建并配置路由
-    var router = new VueRouter({
-        mode: 'history', // 使用 HTML5 History 模式
-        routes: [
-            {
-                path: '/authorization',
-                component: {
-                    template: '<div></div>',
-                    beforeRouteEnter: function(to, from, next) {
-                        // 在路由进入前获取 state 值并传递给 Vue 实例
-                        app.stateValue = to.query.state;
-                        next();
-                    }
-                }
-            }
-        ]
-    });
-
-    // 将路由挂载到 Vue 实例
-    app.$mount('#app');
 </script>
 </body>
 </html>

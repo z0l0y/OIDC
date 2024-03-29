@@ -166,11 +166,19 @@ public class Conversion {
         return authorizeDTO;
     }
 
-    public static ProfileVO toProfileVO(ResourceInfoVO resourceInfoVO){
+    public static ProfileVO toProfileVO(ResourceInfoVO resourceInfoVO) {
         ProfileVO profileVO = new ProfileVO();
         profileVO.setUsername(resourceInfoVO.getUsername());
         profileVO.setNickname(resourceInfoVO.getNickname());
         profileVO.setAvatar(resourceInfoVO.getAvatar());
+        return profileVO;
+    }
+
+    public static ProfileVO toProfileVO(ResourcePO resourcePO) {
+        ProfileVO profileVO = new ProfileVO();
+        profileVO.setUsername(resourcePO.getUsername());
+        profileVO.setNickname(resourcePO.getNickname());
+        profileVO.setAvatar(resourcePO.getAvatar());
         return profileVO;
     }
 }

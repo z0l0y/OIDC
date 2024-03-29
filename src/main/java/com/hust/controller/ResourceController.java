@@ -31,12 +31,13 @@ public class ResourceController {
     private ResourceService resourceService;
 
     /**
-     * 4，接下来这个接口是用来在GitHub（类似）页面跳转后的那个授权页面，就是那个有密码的，如果授权成功那么就会发放code
+     * 2，接下来这个接口是用来在GitHub（类似）页面跳转后的那个授权页面，就是那个有密码的，如果授权成功那么就会发放code
      * 注意这里我们把code存在了resource_info里面，便于我们写后面的取数据的逻辑
+     * 重定向在后端不是很好实现，因为要传参数，没有JS灵活，所以目前我考虑过后就不在后端实现了
      *
      * @param verifyDTO 存储的是用户的基本信息，比如username和password，由我们信任的资源服务器来接受我们的信息，这一块不在第三方进行
      */
-    @PostMapping("/verify/user/identity")
+    @PostMapping("/authenticate")
     public Result verifyUserIdentity(@RequestBody VerifyDTO verifyDTO, HttpServletResponse response) throws IOException {
         Result verifyPass = resourceService.verifyIdentity(verifyDTO);
         if (verifyPass.getCode() == 1) {
@@ -71,7 +72,7 @@ public class ResourceController {
     }
 
     /**
-     * 6.目前看来就只有state是在第三方得到的，其他的逻辑都在我们信任的资源服务器和授权服务器这边，现在看来确实安全很多
+     * 4.目前看来就只有state是在第三方得到的，其他的逻辑都在我们信任的资源服务器和授权服务器这边，现在看来确实安全很多
      * 最后一步，就是解析获取到的Base64编码，得到token进行了（除了client_state，其他的都是在我们这边的表，所以第三方也只能拿到state数据，其他的都是拿不到的，所以很安全）
      * <p>
      * 第5步获取到的token（Base64编码格式）
