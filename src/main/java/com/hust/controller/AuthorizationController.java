@@ -5,6 +5,7 @@ import com.hust.pojo.IDToken;
 import com.hust.pojo.Token;
 import com.hust.service.AuthorizationService;
 import com.hust.utils.*;
+import com.nimbusds.jose.JOSEException;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import static com.hust.utils.CodeUtils.parseCode;
 import static com.hust.utils.Conversion.toAuthorizeDTO;
 import static com.hust.utils.ExamineTokenExpire.examineToken;
 import static com.hust.utils.IDTokenUtils.createIDToken;
+import static com.hust.utils.IDTokenUtils.createJWEToken;
 import static com.hust.utils.JwtUtils.parseJWT;
 import static com.hust.utils.RefreshTokenUtils.parseRefreshToken;
 import static com.hust.utils.StorageUtils.storageToken;
@@ -141,7 +143,7 @@ public class AuthorizationController {
      * @return 返回access token和refresh token，同样注意时效性
      */
     @PostMapping("/token")
-    public Result getAccessToken(@RequestBody TokenDTO tokenDTO) {
+    public Result getAccessToken(@RequestBody TokenDTO tokenDTO) throws JOSEException {
         String code = "";
         try {
             byte[] decodedBytes = Base64.getDecoder().decode(tokenDTO.getCode());
@@ -177,7 +179,7 @@ public class AuthorizationController {
                 Date iat = new Date(System.currentTimeMillis());
                 Date exp = new Date(System.currentTimeMillis() + 60 * 60 * 1000L);
                 String nonce = UUID.randomUUID().toString().replace("-", "");
-                String idToken = createIDToken(iss, sub, aud, exp, iat, nonce);
+                String idToken = createJWEToken(iss, sub, aud, exp, iat, nonce);
                 token.put("id_token", idToken);
                 token.put("token_type", "Bearer");
                 token.put("expires_in", 600000);

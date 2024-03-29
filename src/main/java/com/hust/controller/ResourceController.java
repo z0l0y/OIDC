@@ -7,6 +7,7 @@ import com.hust.pojo.Token;
 import com.hust.service.ResourceService;
 import com.hust.utils.CodeUtils;
 import com.hust.utils.Result;
+import com.nimbusds.jose.JOSEException;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,7 +86,7 @@ public class ResourceController {
         return resourceService.getUserInfo(accessTokenDTO);
     }*/
     @GetMapping("/userinfo")
-    public Result userinfo(@RequestHeader("Authorization") String authorizationHeader) {
+    public Result userinfo(@RequestHeader("Authorization") String authorizationHeader) throws ParseException, JOSEException {
         String accessToken;
         String refreshToken;
         String idToken = "";

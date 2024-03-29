@@ -68,7 +68,10 @@ public class ClientController {
         StateDTO stateDTO = new StateDTO();
         stateDTO.setState(state);
         Result verifyStateResult = restTemplate.postForObject(url, stateDTO, Result.class);
-        return verifyStateResult;
+
+        String url2 = "http://localhost:8080/token";
+        TokenDTO tokenDTO = new TokenDTO("authorization_code", code, "http://localhost:8080/auth/bangumi/callback", "c556723844614ec2a13a270cc8847fc8", "123456");
+        return restTemplate.postForObject(url2, tokenDTO, Result.class);
     }
 
     private Map<String, Object> map = new HashMap<>();

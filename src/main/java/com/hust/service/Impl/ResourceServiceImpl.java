@@ -10,10 +10,12 @@ import com.hust.service.ResourceService;
 import com.hust.utils.AccessTokenUtils;
 import com.hust.utils.Result;
 import com.hust.vo.ResourceInfoVO;
+import com.nimbusds.jose.JOSEException;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +25,7 @@ import static com.hust.utils.AccessTokenUtils.parseAccessToken;
 import static com.hust.utils.CodeUtils.parseCode;
 import static com.hust.utils.Conversion.*;
 import static com.hust.utils.ExamineTokenExpire.examineToken;
+import static com.hust.utils.IDTokenUtils.decryptJWEToken;
 import static com.hust.utils.IDTokenUtils.parseIDToken;
 import static com.hust.utils.RefreshTokenUtils.parseRefreshToken;
 
@@ -54,7 +57,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public Result getUserInfo(AccessTokenDTO accessTokenDTO, String idToken) {
+    public Result getUserInfo(AccessTokenDTO accessTokenDTO, String idToken) throws ParseException, JOSEException {
         byte[] decodedBytes;
         Claims claims1;
         Claims claims2;
@@ -88,8 +91,8 @@ public class ResourceServiceImpl implements ResourceService {
             } catch (RuntimeException runtimeException) {
                 return Result.error("RefreshToken过期了，请您重新登录一下吧!");
             }
-            ResourcePO rowsAffected = resourceMapper.verifyToken(accessToken1, refreshToken);
-            if (rowsAffected == null) {
+            ResourcePO result = resourceMapper.verifyToken(accessToken1, refreshToken);
+            if (result == null) {
                 return Result.error("accessToken和refreshToken已经过时，请换新的Token发起请求！");
             }
             String token = (String) claims2.get("refreshToken");
@@ -102,7 +105,7 @@ public class ResourceServiceImpl implements ResourceService {
             resourceMapper.updateAccessToken(uuidAccessToken, token);
             ResourcePO userInfo = resourceMapper.getUserInfo(uuidAccessToken);
             ResourceInfoVO resourceInfoVO = toResourceInfoVO(userInfo);
-            Claims claims = parseIDToken(idToken);
+            Claims claims = parseIDToken(decryptJWEToken(idToken));
             HashMap<Object, Object> map = new HashMap<>();
             String scope = new String();
             if (scope.contains("openid")) {
