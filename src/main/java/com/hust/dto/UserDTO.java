@@ -30,4 +30,6 @@ public class UserDTO {
 
     @Size(max = 64, message = "Bio must not exceed 64 characters")
     private String bio;
+
+    private String code;
 }

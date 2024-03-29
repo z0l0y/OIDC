@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.hust.utils.Constants.*;
 import static com.hust.utils.Constants.EMAIL_ADDRESS;
+import static com.hust.utils.RandomCodeGenerator.generateRandomCode;
 
 public class SendEmail {
     private static final Map<String, Long> lastRequestTimeMap = new ConcurrentHashMap<>();
@@ -20,8 +21,13 @@ public class SendEmail {
     public static Result sendEmail(UserDTO userDTO) throws MessagingException, GeneralSecurityException {
         // 加密的话就先拦截一下，处理啊完了再让它进行存储
         String username = userDTO.getUsername();
+        Long lastRequestTime = 0L;
         // 从缓存中取出该用户最后一次请求邮件的时间戳
-        Long lastRequestTime = lastRequestTimeMap.get(username);
+        if (lastRequestTimeMap.get(username) == null) {
+            lastRequestTimeMap.put(username, System.currentTimeMillis());
+        } else {
+            lastRequestTime = lastRequestTimeMap.get(username);
+        }
         // 判断当前时间和上一次请求邮件的时间间隔是否超过设定的阈值
         if (lastRequestTime != null && System.currentTimeMillis() - lastRequestTime < 60_000) {
             // 如果未超过阈值，则返回提示信息拒绝发送邮件
@@ -72,7 +78,7 @@ public class SendEmail {
         //邮件的标题
         message.setSubject("以下是注册验证");
         //邮件的文本内容
-        message.setContent("<h1 style='color:red'>验证成功，您已经成功注册！</h1>", "text/html;charset=UTF-8");
+        message.setContent("<h1 style='color:red'>您的验证码是</h1>" + userDTO.getCode(), "text/html;charset=UTF-8");
         //5、发送邮件
         ts.sendMessage(message, message.getAllRecipients());
         //6、关闭连接

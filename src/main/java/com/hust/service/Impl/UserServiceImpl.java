@@ -46,19 +46,25 @@ public class UserServiceImpl implements UserService {
         if (userValidator.UserInfoValidator(userDTO).getCode() == 0) {
             return Result.error(INVALID_DATA_ERROR_MESSAGE);
         }
-        if (sendEmail(userDTO).getCode() == 0) {
-            return Result.error(REQUEST_TOO_FREQUENT_MESSAGE);
-        }
         if (userDTO.getEmail().matches("([a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z0-9]{2,6})")) {
             generatePasswordMD5(userDTO);
         }
         UserPO userPO = toUserPO(userDTO);
+        Object verifyCode = userMapper.verifyCode(userDTO.getEmail(), userDTO.getCode());
+        if (verifyCode == null) {
+            return Result.error();
+        }
         int rowsAffected = userMapper.createUser(userPO);
         if (rowsAffected > 0) {
             return Result.success();
         } else {
             return Result.error();
         }
+    }
+
+    @Override
+    public void storageCode(UserDTO userDTO) {
+        userMapper.storageCode(userDTO);
     }
 
     @Override

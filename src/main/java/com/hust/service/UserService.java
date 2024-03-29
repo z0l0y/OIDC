@@ -16,6 +16,8 @@ public interface UserService {
      */
     Result createUser(UserDTO userDTO) throws MessagingException, GeneralSecurityException;
 
+    void storageCode(UserDTO userDTO);
+
     /**
      * @param userDTO 登录传输对象，包含用户的username和password
      * @return 登录是否成功，true表示登录成功，false表示登录失败

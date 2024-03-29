@@ -21,12 +21,30 @@ import java.util.Map;
 
 import static com.hust.utils.Constants.*;
 import static com.hust.utils.JwtUtils.parseJWT;
+import static com.hust.utils.RandomCodeGenerator.generateRandomCode;
+import static com.hust.utils.SendEmail.sendEmail;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @PostMapping("/code")
+    public Result getCode(@RequestBody UserDTO userDTO) {
+        String code = generateRandomCode();
+        userDTO.setCode(code);
+        try {
+            if (sendEmail(userDTO).getCode() == 0) {
+                return Result.error(REQUEST_TOO_FREQUENT_MESSAGE);
+            }
+            userService.storageCode(userDTO);
+        } catch (MessagingException | GeneralSecurityException e) {
+            e.printStackTrace();
+            return Result.error("发送邮件失败！");
+        }
+        return Result.success("发送邮件成功！");
+    }
 
     @PostMapping("/register")
     public Result createUser(@RequestBody UserDTO userDTO) throws GeneralSecurityException, MessagingException {

@@ -81,6 +81,7 @@
                id="email" required><br>
     </div>
 
+
     <!-- <div style="padding: 5px 0; font-weight: bold;display: flex; justify-content: center; align-items: center;">
          <label for="avatar">您的头像：</label>
      </div>
@@ -102,11 +103,27 @@
         </label><br>
     </div>
 
+    <div style="padding: 5px 0; font-weight: bold;display: flex; justify-content: center; align-items: center;">
+        <label for="email">请输入你在邮箱中获得的验证码:</label>
+    </div>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <input id="code"
+               style="outline: none;border-radius: 20px; border: none;width: 300px;height:30px;padding: 5px 10px"
+               required><br>
+    </div>
+
     <div style="display: flex; justify-content: center; align-items: center;">
         <strong>小tips：为了能更快的注册成功，您的邮箱不要写</strong>
     </div>
     <div style="display: flex; justify-content: center; align-items: center;">
         <strong>错，要不然是注册不了的哦</strong>
+    </div>
+    <!-- 注册按钮 -->
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <button id="getCode"
+                style="border-radius: 20px; width: 150px; padding: 5px 5px;font-size: large;color: black;"
+                onclick="getCode()">获取验证码
+        </button>
     </div>
     <!-- 注册按钮 -->
     <div style="display: flex; justify-content: center; align-items: center;">
@@ -125,12 +142,51 @@
         },
     })
 
+    function getCode() {
+        var email = document.getElementById("email").value;
+        if (email === "") {
+            alert("请输入邮箱");
+            return;
+        }
+
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const nickname = document.getElementById("nickname").value;
+        // 设置请求体，包含用户注册信息
+        const requestBody = {
+            "username": username,
+            "password": password,
+            "email": email,
+            "nickname": nickname,
+        };
+
+        // 发送获取验证码的请求到后端
+        fetch("http://localhost:8080/user/code", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestBody)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("验证码已发送至您的邮箱，请查收");
+                }
+            })
+            .catch(error => {
+                console.error("获取验证码出错:", error);
+                alert("获取验证码出错");
+            });
+    }
+
     document.getElementById("registerButton").addEventListener("click", function () {
         // 获取用户输入的注册信息
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
         const email = document.getElementById("email").value;
         const nickname = document.getElementById("nickname").value;
+        const code = document.getElementById("code").value;
         if (email === "") {
             return;
         }
@@ -154,6 +210,7 @@
             "password": password,
             "email": email,
             "nickname": nickname,
+            "code": code
         });
 
         // 注册请求成功时的回调函数

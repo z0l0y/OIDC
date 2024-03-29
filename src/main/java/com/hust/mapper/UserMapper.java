@@ -1,5 +1,6 @@
 package com.hust.mapper;
 
+import com.hust.dto.UserDTO;
 import com.hust.po.UserPO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -8,6 +9,14 @@ import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface UserMapper {
+
+    @Insert("insert into mail_code (email, code) values (#{email}, #{code})")
+    void storageCode(UserDTO userDTO);
+
+    @Select("select * from oidc.mail_code where email = #{email} and code = #{code}")
+    Object verifyCode(String email, String code);
+
+
     /**
      * 创建用户.
      *
