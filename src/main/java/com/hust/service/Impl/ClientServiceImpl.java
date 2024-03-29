@@ -39,7 +39,7 @@ public class ClientServiceImpl implements ClientService {
             state = new String(decodedBytes);
             Claims claims = parseState(state);
         } catch (RuntimeException e) {
-            return Result.error("state被修改，检测到CSRF攻击!");
+            return Result.error("state已失效或被恶意修改，请重新进行授权验证！");
         }
         try {
             examineToken(state);

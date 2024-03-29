@@ -160,14 +160,14 @@ public class AuthorizationController {
             code = new String(decodedBytes);
             parseCode(code);
         } catch (RuntimeException e) {
-            return Result.error("code被恶意修改，请您重新授权！");
+            return Result.error("code被恶意修改或已失效，请您重新授权！");
         }
         Result result = new Result();
         try {
             result = examineToken(code);
         } catch (RuntimeException e) {
             e.printStackTrace();
-            return Result.error("您的code已过期，请重新授权！");
+            return Result.error("您的code已失效，请您重新授权！");
         }
         if (result.getCode() == 1) {
             Result verify = authorizationService.verifyClientInfo(tokenDTO);
@@ -205,7 +205,7 @@ public class AuthorizationController {
                 return Result.error("请检查您的客户端ID和客户端密钥是否正确！");
             }
         } else {
-            return Result.error("code非法，请重新授权！");
+            return Result.error("code非法，请您重新授权！");
         }
     }
 

@@ -66,7 +66,7 @@ public class ResourceServiceImpl implements ResourceService {
         try {
             decodedBytes = Base64.getDecoder().decode(accessTokenDTO.getAccessToken());
         } catch (RuntimeException e) {
-            return Result.error("请您不要恶意修改accessToken的信息!");
+            return Result.error("accessToken被恶意修改或已经失效!");
         }
         String accessToken1 = new String(decodedBytes);
         // 阿里巴巴开发手册里面说过，要对try-catch负责，首先我们不能直接一大块全部try-catch，我们try-catch的颗粒度一定要细（精准try-catch），不能太粗了，其次是我们应该对try-catch部分发生的错误好好说明，对于前端的开发人员更加的友好
@@ -83,17 +83,17 @@ public class ResourceServiceImpl implements ResourceService {
                 refreshToken = new String(decodedRefreshToken);
                 claims2 = parseRefreshToken(refreshToken);
             } catch (RuntimeException exception) {
-                return Result.error("请您不要恶意修改refreshToken的信息!");
+                return Result.error("refreshToken被恶意修改或已经失效!");
             }
             // 使用RefreshToken获取新的AccessToken的逻辑
             try {
                 examineToken(refreshToken);
             } catch (RuntimeException runtimeException) {
-                return Result.error("RefreshToken过期了，请您重新登录一下吧!");
+                return Result.error("RefreshToken已失效，请您重新登录一下吧!");
             }
             ResourcePO result = resourceMapper.verifyToken(accessToken1, refreshToken);
             if (result == null) {
-                return Result.error("accessToken和refreshToken已经过时，请换新的Token发起请求！");
+                return Result.error("accessToken和refreshToken已经失效，请重新获取Token发起请求！");
             }
             String token = (String) claims2.get("refreshToken");
             // 获取到新的AccessToken后，继续下面的逻辑
