@@ -72,10 +72,11 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         AppPO app = authorizationMapper.verifyClient(appPO);
         Claims claims = parseCode(tokenDTO.getCode());
         ResourcePO resourcePO = authorizationMapper.verifyCode((String) claims.get("code"));
-        if (app == null || resourcePO == null) {
+        ResourcePO userInfo = authorizationMapper.getUserInfo(tokenDTO.getCode());
+        if (app == null || resourcePO == null || userInfo == null) {
             return Result.error();
         } else {
-            return Result.success();
+            return Result.success(userInfo);
         }
     }
 

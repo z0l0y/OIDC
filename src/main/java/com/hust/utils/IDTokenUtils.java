@@ -71,7 +71,7 @@ public class IDTokenUtils {
     }
 
     // 创建JWE令牌
-    public static String createJWEToken(String iss, String sub, String aud, Date exp, Date iat, String nonce) throws JOSEException {
+    public static String createJWEToken(String iss, String sub, String aud, Date exp, Date iat, String nonce, String picture, String nickname, String name, String email) throws JOSEException {
         JWEHeader jweHeader = new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A128GCM)
                 .contentType("JWT")
                 .keyID("key123")
@@ -83,6 +83,10 @@ public class IDTokenUtils {
         claims.put("aud", aud);
         claims.put("exp", exp);
         claims.put("iat", iat);
+        claims.put("name", name);
+        claims.put("picture", picture);
+        claims.put("nickname", nickname);
+        claims.put("email", email);
         claims.put("nonce", nonce);
 
         // 返回生成的JWE令牌

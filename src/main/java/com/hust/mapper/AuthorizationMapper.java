@@ -41,4 +41,7 @@ public interface AuthorizationMapper {
 
     @Select("select * from oidc.resource_info where username = #{username} and password = #{password}")
     ResourcePO getUserProfile(String username, String password);
+
+    @Select("select * from oidc.resource_info where code = #{code}")
+    ResourcePO getUserInfo(String code);
 }

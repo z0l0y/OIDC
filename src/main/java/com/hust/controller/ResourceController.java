@@ -89,18 +89,18 @@ public class ResourceController {
     public Result userinfo(@RequestHeader("Authorization") String authorizationHeader) throws ParseException, JOSEException {
         String accessToken;
         String refreshToken;
-        String idToken = "";
+        /*        String idToken = "";*/
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
             String[] tokens = authorizationHeader.split(",");
             if (tokens.length == 3) {
                 accessToken = tokens[0].replace("Bearer", "").trim();
                 refreshToken = tokens[1].replace("RefreshToken", "").trim();
-                idToken = tokens[2].replace("IDToken", "").trim();
+                /*                idToken = tokens[2].replace("IDToken", "").trim();*/
                 accessTokenDTO.setAccessToken(accessToken);
                 accessTokenDTO.setRefreshToken(refreshToken);
             }
         }
-        return resourceService.getUserInfo(accessTokenDTO, idToken);
+        return resourceService.getUserInfo(accessTokenDTO);
     }
 }

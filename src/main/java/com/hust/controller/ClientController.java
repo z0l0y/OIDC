@@ -82,8 +82,8 @@ public class ClientController {
     public Map<String, Object> showOpenidConfiguration() {
         if (flag == 0) {
             // 如果缓存中不存在数据，则进行数据的生成和缓存
-            map.put("issuer", new String[]{"http://localhost:8080/authorize"});
-            map.put("authorization_endpoint", new String[]{"http://localhost:8080/authenticate"});
+            map.put("issuer", new String[]{"http://localhost:8080"});
+            map.put("authorization_endpoint", new String[]{"http://localhost:8080/authorize"});
             map.put("token_endpoint", new String[]{"http://localhost:8080/token"});
             map.put("userinfo_endpoint", new String[]{"http://localhost:8080/userinfo"});
             map.put("response_types_supported", new String[]{"code"});

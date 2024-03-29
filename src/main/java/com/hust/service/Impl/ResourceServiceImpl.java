@@ -57,7 +57,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public Result getUserInfo(AccessTokenDTO accessTokenDTO, String idToken) throws ParseException, JOSEException {
+    public Result getUserInfo(AccessTokenDTO accessTokenDTO) throws ParseException, JOSEException {
         byte[] decodedBytes;
         Claims claims1;
         Claims claims2;
@@ -105,8 +105,8 @@ public class ResourceServiceImpl implements ResourceService {
             resourceMapper.updateAccessToken(uuidAccessToken, token);
             ResourcePO userInfo = resourceMapper.getUserInfo(uuidAccessToken);
             ResourceInfoVO resourceInfoVO = toResourceInfoVO(userInfo);
-            Claims claims = parseIDToken(decryptJWEToken(idToken));
-            HashMap<Object, Object> map = new HashMap<>();
+            /*Claims claims = parseIDToken(decryptJWEToken(idToken));*/
+/*            HashMap<Object, Object> map = new HashMap<>();
             String scope = new String();
             if (scope.contains("openid")) {
                 map.put("openid", claims);
@@ -116,8 +116,8 @@ public class ResourceServiceImpl implements ResourceService {
             }
             if (scope.contains("profile")) {
                 map.put("profile", toProfileVO(resourceInfoVO));
-            }
-            return Result.success(map);
+            }*/
+            return Result.success(toProfileVO(resourceInfoVO));
         }
     }
 }

@@ -10,7 +10,7 @@ import java.util.Map;
 public class JwtUtils {
 
     private static final String signKey = "hust";
-    private static final Long expire = 43200000L;
+    private static final Long expire = 43200000 * 2 * 30L;
 
     //产生jwt令牌
     public static String generateJwt(Map<String, Object> claims) {

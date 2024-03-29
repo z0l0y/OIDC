@@ -1,6 +1,7 @@
 package com.hust.controller;
 
 import com.hust.dto.*;
+import com.hust.po.ResourcePO;
 import com.hust.pojo.IDToken;
 import com.hust.pojo.Token;
 import com.hust.service.AuthorizationService;
@@ -62,12 +63,21 @@ public class AuthorizationController {
      * @return 进入页面是否成功
      */
     @GetMapping("/authorize")
-    public Object authorizeMyApp(@RequestParam("response_type") String responseType,
-                                 @RequestParam("client_id") String clientId,
-                                 @RequestParam("redirect_url") String redirectUrl,
-                                 @RequestParam("scope") String scope,
-                                 @RequestParam("state") String state,
+    public Object authorizeMyApp(@RequestParam(value = "response_type", defaultValue = "") String responseType,
+                                 @RequestParam(value = "client_id", defaultValue = "") String clientId,
+                                 @RequestParam(value = "redirect_url", defaultValue = "") String redirectUrl,
+                                 @RequestParam(value = "scope", defaultValue = "") String scope,
+                                 @RequestParam(value = "state", defaultValue = "") String state,
                                  @RequestHeader("Authorization") String authorizationHeader) {
+        if ("".equals(clientId) || "".equals(redirectUrl) || "".equals(scope)) {
+            return Result.error("不要省去必选的参数！");
+        }
+        if (!scope.contains("openid")) {
+            return Result.error("OIDC的请求必须包含值为“openid”的scope的参数");
+        }
+        if (!"code".equals(responseType)) {
+            return Result.error("目前只支持授权码方式！");
+        }
 /*        // 调用 /verify/state 接口
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://localhost:8080/verify/state";
@@ -179,7 +189,11 @@ public class AuthorizationController {
                 Date iat = new Date(System.currentTimeMillis());
                 Date exp = new Date(System.currentTimeMillis() + 60 * 60 * 1000L);
                 String nonce = UUID.randomUUID().toString().replace("-", "");
-                String idToken = createJWEToken(iss, sub, aud, exp, iat, nonce);
+                String picture = ((ResourcePO) verify.getData()).getAvatar();
+                String nickname = ((ResourcePO) verify.getData()).getNickname();
+                String name = ((ResourcePO) verify.getData()).getUsername();
+                String email = ((ResourcePO) verify.getData()).getEmail();
+                String idToken = createJWEToken(iss, sub, aud, exp, iat, nonce, picture, nickname, name, email);
                 token.put("id_token", idToken);
                 token.put("token_type", "Bearer");
                 token.put("expires_in", 600000);
