@@ -13,5 +13,5 @@ public interface ResourceService {
 
     Result storageCode(Code code);
 
-    Result getUserInfo(AccessTokenDTO accessTokenDTO) throws ParseException, JOSEException;
+    Result getUserInfo(AccessTokenDTO accessTokenDTO, String idToken) throws ParseException, JOSEException;
 }

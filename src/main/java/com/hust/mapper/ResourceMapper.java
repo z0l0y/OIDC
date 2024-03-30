@@ -28,4 +28,7 @@ public interface ResourceMapper {
 
     @Select("select * from oidc.resource_info where access_token = #{accessToken} and refresh_token = #{refreshToken}")
     ResourcePO verifyToken(String accessToken, String refreshToken);
+
+    @Select("select * from oidc.resource_info where refresh_token = #{refreshToken}")
+    ResourcePO getScope(String refreshToken);
 }

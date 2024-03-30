@@ -49,7 +49,7 @@ public class ResourceController {
             claims.put("code", uuidCode);
             String code = CodeUtils.generateCode(claims);
             String base64Code = Base64.getEncoder().encodeToString(code.getBytes());
-            Code storageCode = storageCode(verifyDTO, uuidCode);
+            Code storageCode = storageCode(verifyDTO, code);
             resourceService.storageCode(storageCode);
             return Result.success(base64Code);
         } else {
@@ -89,18 +89,18 @@ public class ResourceController {
     public Result userinfo(@RequestHeader("Authorization") String authorizationHeader) throws ParseException, JOSEException {
         String accessToken;
         String refreshToken;
-        /*        String idToken = "";*/
+        String idToken = "";
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
             String[] tokens = authorizationHeader.split(",");
             if (tokens.length == 3) {
                 accessToken = tokens[0].replace("Bearer", "").trim();
                 refreshToken = tokens[1].replace("RefreshToken", "").trim();
-                /*                idToken = tokens[2].replace("IDToken", "").trim();*/
+                idToken = tokens[2].replace("IDToken", "").trim();
                 accessTokenDTO.setAccessToken(accessToken);
                 accessTokenDTO.setRefreshToken(refreshToken);
             }
         }
-        return resourceService.getUserInfo(accessTokenDTO);
+        return resourceService.getUserInfo(accessTokenDTO, idToken);
     }
 }

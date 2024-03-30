@@ -158,6 +158,7 @@ public class AuthorizationController {
         try {
             byte[] decodedBytes = Base64.getDecoder().decode(tokenDTO.getCode());
             code = new String(decodedBytes);
+            System.out.println(code);
             parseCode(code);
         } catch (RuntimeException e) {
             return Result.error("code被恶意修改或已失效，请您重新授权！");
@@ -198,7 +199,7 @@ public class AuthorizationController {
                 token.put("token_type", "Bearer");
                 token.put("expires_in", 600000);
                 token.put("refresh_token", base64RefreshToken);
-                Token storageToken = storageToken(uuidAccessToken, uuidRefreshToken, tokenDTO.getCode());
+                Token storageToken = storageToken(accessToken, refreshToken, code);
                 authorizationService.storageToken(storageToken);
                 return Result.success(token);
             } else {

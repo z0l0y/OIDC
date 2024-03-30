@@ -69,10 +69,11 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         String code = new String(decodedBytes);
         tokenDTO.setCode(code);
         AppPO appPO = toAppPO(tokenDTO);
+        System.out.println(code);
         AppPO app = authorizationMapper.verifyClient(appPO);
         Claims claims = parseCode(tokenDTO.getCode());
-        ResourcePO resourcePO = authorizationMapper.verifyCode((String) claims.get("code"));
-        ResourcePO userInfo = authorizationMapper.getUserInfo(tokenDTO.getCode());
+        ResourcePO resourcePO = authorizationMapper.verifyCode(code);
+        ResourcePO userInfo = authorizationMapper.getUserInfo(code);
         if (app == null || resourcePO == null || userInfo == null) {
             return Result.error();
         } else {
@@ -83,8 +84,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     @Override
     public Result storageToken(Token token) {
         // 等会要加好多好多的try-catch，赶紧搞吧
-        Claims claims = parseCode(token.getCode());
-        token.setCode((String) claims.get("code"));
+/*        Claims claims = parseCode(token.getCode());
+        token.setCode((String) claims.get("code"));*/
         int rowsAffected = authorizationMapper.updateToken(token);
         if (rowsAffected > 0) {
             return Result.success();

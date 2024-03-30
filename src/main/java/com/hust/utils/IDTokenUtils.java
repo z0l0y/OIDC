@@ -26,6 +26,7 @@ public class IDTokenUtils {
         SecureRandom secureRandom = new SecureRandom();
         secureRandom.nextBytes(keyBytes);
         SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, "AES");
+        System.out.println("secretKeySpec" + secretKeySpec);
         return secretKeySpec;
     }
 
@@ -74,7 +75,6 @@ public class IDTokenUtils {
     public static String createJWEToken(String iss, String sub, String aud, Date exp, Date iat, String nonce, String picture, String nickname, String name, String email) throws JOSEException {
         JWEHeader jweHeader = new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A128GCM)
                 .contentType("JWT")
-                .keyID("key123")
                 .build();
         JWEEncrypter encrypter = new DirectEncrypter(secretKey);
         Map<String, Object> claims = new HashMap<>();
