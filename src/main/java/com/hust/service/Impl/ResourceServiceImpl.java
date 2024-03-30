@@ -74,6 +74,7 @@ public class ResourceServiceImpl implements ResourceService {
             String token = (String) claims1.get("accessToken");
             ResourcePO userInfo = resourceMapper.getUserInfo(token);
             resourceInfoVO = toResourceInfoVO(userInfo);
+            examineToken(accessToken1);
         } catch (RuntimeException e) {
             // AccessToken过期，尝试使用RefreshToken获取新的AccessToken
             try {
@@ -106,7 +107,7 @@ public class ResourceServiceImpl implements ResourceService {
             resourceInfoVO = toResourceInfoVO(userInfo);
             /*            ProfileVO profileVO = toProfileVO(resourceInfoVO);*/
         }
-        Claims claims;
+        Claims claims = null;
         try {
             decodedRefreshToken = Base64.getDecoder().decode(accessTokenDTO.getRefreshToken());
             refreshToken = new String(decodedRefreshToken);
@@ -117,33 +118,37 @@ public class ResourceServiceImpl implements ResourceService {
 
         }
         try {
-            claims = parseIDToken(decryptJWEToken(idToken));
+            System.out.println("tokenJWE加密: " + idToken);
+            String token = decryptJWEToken(idToken);
+            claims = parseIDToken(token);
+            System.out.println("tokenJWT: " + token);
         } catch (RuntimeException runtimeException) {
-            return Result.error("请不要恶意修改JWE令牌的信息！");
-        }
-        try {
-            System.out.println(claims.get("iss"));
-            if (!"http://localhost:8080/authorize".equals(claims.get("iss"))) {
-                return Result.error("iss被修改！");
+            /*return Result.error("请不要恶意修改JWE令牌的信息！");*/
+            // JWT expired at 2024-03-30T13:48:25Z. Current time: 2024-03-30T13:58:49Z, a difference of 624837 milliseconds.  Allowed clock skew: 0 milliseconds.
+            try {
+                System.out.println(claims.get("iss"));
+                if (!"http://localhost:8080/authorize".equals(claims.get("iss"))) {
+                    return Result.error("iss被修改！");
+                }
+                if (!"c556723844614ec2a13a270cc8847fc8".equals((String) claims.get("aud"))) {
+                    return Result.error("aud被修改！");
+                }
+                examineToken(decryptJWEToken(idToken));
+            } catch (RuntimeException exception) {
+                String iss = "http://localhost:8080/authorize";
+                String sub = UUID.randomUUID().toString().replace("-", "");
+                String aud = "c556723844614ec2a13a270cc8847fc8";
+                Date iat = new Date(System.currentTimeMillis());
+                Date exp = new Date(System.currentTimeMillis() + 60 * 60 * 1000L);
+                String nonce = UUID.randomUUID().toString().replace("-", "");
+                String picture = resourceInfoVO.getAvatar();
+                String nickname = resourceInfoVO.getNickname();
+                String name = resourceInfoVO.getUsername();
+                String email = resourceInfoVO.getEmail();
+                String idTokenRefresh = createJWEToken(iss, sub, aud, exp, iat, nonce, picture, nickname, name, email);
+                System.out.println(decryptJWEToken(idTokenRefresh));
+                claims = parseIDToken(decryptJWEToken(idTokenRefresh));
             }
-            if (!"c556723844614ec2a13a270cc8847fc8".equals((String) claims.get("aud"))) {
-                return Result.error("aud被修改！");
-            }
-            examineToken(decryptJWEToken(idToken));
-        } catch (RuntimeException exception) {
-            String iss = "http://localhost:8080/authorize";
-            String sub = UUID.randomUUID().toString().replace("-", "");
-            String aud = "c556723844614ec2a13a270cc8847fc8";
-            Date iat = new Date(System.currentTimeMillis());
-            Date exp = new Date(System.currentTimeMillis() + 60 * 60 * 1000L);
-            String nonce = UUID.randomUUID().toString().replace("-", "");
-            String picture = resourceInfoVO.getAvatar();
-            String nickname = resourceInfoVO.getNickname();
-            String name = resourceInfoVO.getUsername();
-            String email = resourceInfoVO.getEmail();
-            String idTokenRefresh = createJWEToken(iss, sub, aud, exp, iat, nonce, picture, nickname, name, email);
-            System.out.println(decryptJWEToken(idToken));
-            claims = parseIDToken(decryptJWEToken(idToken));
         }
 
         HashMap<Object, Object> map = new HashMap<>();

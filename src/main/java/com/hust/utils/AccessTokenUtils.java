@@ -9,8 +9,9 @@ import java.util.Map;
 
 public class AccessTokenUtils {
     private static final String signKey = "hust";
-    private static final Long expire = 600000 * 3L;
+    private static final Long expire = 1000L;
 
+    // 600000 * 3
     //产生jwt令牌
     public static String generateAccessToken(Map<String, Object> claims) {
         String jwt = Jwts.builder()

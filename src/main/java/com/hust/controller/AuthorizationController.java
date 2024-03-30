@@ -17,13 +17,13 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.*;
 
 import static com.hust.utils.CodeUtils.parseCode;
 import static com.hust.utils.Conversion.toAuthorizeDTO;
 import static com.hust.utils.ExamineTokenExpire.examineToken;
-import static com.hust.utils.IDTokenUtils.createIDToken;
-import static com.hust.utils.IDTokenUtils.createJWEToken;
+import static com.hust.utils.IDTokenUtils.*;
 import static com.hust.utils.JwtUtils.parseJWT;
 import static com.hust.utils.RefreshTokenUtils.parseRefreshToken;
 import static com.hust.utils.StorageUtils.storageToken;
@@ -200,6 +200,11 @@ public class AuthorizationController {
                 token.put("expires_in", 600000);
                 token.put("refresh_token", base64RefreshToken);
                 Token storageToken = storageToken(accessToken, refreshToken, code);
+                try {
+                    System.out.println("idTokenJWT:" + decryptJWEToken(idToken));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 authorizationService.storageToken(storageToken);
                 return Result.success(token);
             } else {
