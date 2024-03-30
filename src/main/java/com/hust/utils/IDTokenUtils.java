@@ -26,7 +26,7 @@ public class IDTokenUtils {
         SecureRandom secureRandom = new SecureRandom();
         secureRandom.nextBytes(keyBytes);
         SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, "AES");
-        System.out.println("secretKeySpec" + secretKeySpec);
+        System.out.println("secretKeySpec： " + secretKeySpec);
         return secretKeySpec;
     }
 
@@ -94,10 +94,14 @@ public class IDTokenUtils {
     }
 
     // 解密JWE
-    public static String decryptJWEToken(String jweToken) throws JOSEException, ParseException {
+    public static String decryptJWEToken(String jweToken) throws KeyLengthException, ParseException {
         JWEDecrypter decrypter = new DirectDecrypter(secretKey);
         JWEObject jweObject = JWEObject.parse(jweToken);
-        jweObject.decrypt(decrypter);
+        try {
+            jweObject.decrypt(decrypter);
+        } catch (JOSEException e) {
+            e.printStackTrace();
+        }
         return jweObject.getPayload().toString();
     }
 }

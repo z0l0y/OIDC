@@ -62,12 +62,16 @@ public class ClientController {
     }
 
     @GetMapping("/auth/bangumi/callback")
-    public Result callBack(@RequestParam("code") String code, @RequestParam("state") String state) {
+    public Result callBack(@RequestParam(value = "code", defaultValue = "") String code, @RequestParam(value = "state", defaultValue = "") String state) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://localhost:8080/verify/state";
         StateDTO stateDTO = new StateDTO();
         stateDTO.setState(state);
         Result verifyStateResult = restTemplate.postForObject(url, stateDTO, Result.class);
+
+        if (verifyStateResult.getCode() == 0) {
+            return verifyStateResult;
+        }
 
         String url2 = "http://localhost:8080/token";
         TokenDTO tokenDTO = new TokenDTO("authorization_code", code, "http://localhost:8080/auth/bangumi/callback", "c556723844614ec2a13a270cc8847fc8", "123456");

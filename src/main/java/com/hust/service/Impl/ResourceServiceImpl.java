@@ -89,9 +89,10 @@ public class ResourceServiceImpl implements ResourceService {
             } catch (RuntimeException runtimeException) {
                 return Result.error("RefreshToken已失效，请您重新登录一下吧!");
             }
-            ResourcePO result = resourceMapper.verifyToken(accessToken1, refreshToken);
-            if (result == null) {
-                return Result.error("accessToken和refreshToken已经失效，请重新获取Token发起请求！");
+            ResourcePO result1 = resourceMapper.verifyAccessToken(refreshToken);
+            ResourcePO result2 = resourceMapper.verifyRefreshToken(refreshToken);
+            if (result1 == null && result2 == null) {
+                return Result.error("accessToken和refreshToken已经失效或被恶意修改，请重新获取Token发起请求！");
             }
             String token = (String) claims2.get("refreshToken");
             // 获取到新的AccessToken后，继续下面的逻辑
@@ -117,6 +118,10 @@ public class ResourceServiceImpl implements ResourceService {
         }
         try {
             claims = parseIDToken(decryptJWEToken(idToken));
+        } catch (RuntimeException runtimeException) {
+            return Result.error("请不要恶意修改JWE令牌的信息！");
+        }
+        try {
             System.out.println(claims.get("iss"));
             if (!"http://localhost:8080/authorize".equals(claims.get("iss"))) {
                 return Result.error("iss被修改！");
