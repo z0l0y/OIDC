@@ -26,9 +26,10 @@ public class FriendShipServiceImpl implements FriendShipService {
 
     @Override
     public Result applyFriend(FriendDTO friendDTO) {
-        FriendShipPO[] friendShipPOS = friendShipMapper.verifyApplication(friendDTO);
-        if (friendShipPOS.length != 0) {
-            return Result.success("您已成功申请！");
+        FriendShipPO[] friendShipPOS1 = friendShipMapper.verifyApplication1(friendDTO);
+        FriendShipPO[] friendShipPOS2 = friendShipMapper.verifyApplication2(friendDTO);
+        if (friendShipPOS1.length != 0 || friendShipPOS2.length != 0) {
+            return Result.success("请勿重复申请！");
         }
         int rowsAffected = friendShipMapper.applyFriend(friendDTO);
         if (rowsAffected > 0) {
@@ -58,13 +59,13 @@ public class FriendShipServiceImpl implements FriendShipService {
     @Override
     public Result agreeFriend(FriendDTO friendDTO) {
         friendShipMapper.agreeFriend(friendDTO);
-        return Result.success("已同意该用户的好友申请");
+        return Result.success("您已同意该用户的好友申请");
     }
 
     @Override
     public Result disagreeFriend(FriendDTO friendDTO) {
         friendShipMapper.disagreeFriend(friendDTO);
-        return Result.success("已拒绝该用户的好友申请！");
+        return Result.success("您已拒绝该用户的好友申请！");
     }
 
     /**
@@ -91,9 +92,13 @@ public class FriendShipServiceImpl implements FriendShipService {
     @Override
     public List<String> showMyAllFriends(String username) {
         List<String> list = new ArrayList<>();
-        FriendShipPO[] friendShipPOS = friendShipMapper.showMyAllFriends(username);
-        for (FriendShipPO friendShipPO1 : friendShipPOS) {
+        FriendShipPO[] friendShipPOS1 = friendShipMapper.showMyAllFriends1(username);
+        FriendShipPO[] friendShipPOS2 = friendShipMapper.showMyAllFriends2(username);
+        for (FriendShipPO friendShipPO1 : friendShipPOS1) {
             list.add(friendShipPO1.getUser1());
+        }
+        for (FriendShipPO friendShipPO2 : friendShipPOS2) {
+            list.add(friendShipPO2.getUser2());
         }
         return list;
     }

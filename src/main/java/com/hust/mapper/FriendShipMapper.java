@@ -13,7 +13,10 @@ import java.util.List;
 @Mapper
 public interface FriendShipMapper {
     @Select("select * from oidc.friendship where user1 = #{user1} and user2 = #{user2}")
-    FriendShipPO[] verifyApplication(FriendDTO friendDTO);
+    FriendShipPO[] verifyApplication1(FriendDTO friendDTO);
+
+    @Select("select * from oidc.friendship where user1 = #{user2} and user2 = #{user1}")
+    FriendShipPO[] verifyApplication2(FriendDTO friendDTO);
 
     @Insert("insert into friendship (user1, user2) values (#{user1}, #{user2})")
     int applyFriend(FriendDTO friendDTO);
@@ -37,5 +40,8 @@ public interface FriendShipMapper {
     List<RatingPO> notifyUser2(String user1);
 
     @Select("select * from oidc.friendship where user2 = #{username} and status = 1")
-    FriendShipPO[] showMyAllFriends(String username);
+    FriendShipPO[] showMyAllFriends1(String username);
+
+    @Select("select * from oidc.friendship where user1 = #{username} and status = 1")
+    FriendShipPO[] showMyAllFriends2(String username);
 }

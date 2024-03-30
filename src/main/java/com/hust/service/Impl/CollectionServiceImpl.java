@@ -3,6 +3,7 @@ package com.hust.service.Impl;
 import com.hust.dto.CollectDTO;
 import com.hust.dto.SearchDTO;
 import com.hust.mapper.CollectionMapper;
+import com.hust.po.AnimePO;
 import com.hust.po.CollectionPO;
 import com.hust.po.RatingPO;
 import com.hust.service.CollectionService;
@@ -25,6 +26,10 @@ public class CollectionServiceImpl implements CollectionService {
     public Result collectAnime(CollectDTO collectDTO) {
         CollectionPO collectionPO = toCollectionPO(collectDTO);
         RatingPO ratingPO = toRatingPO(collectDTO);
+        AnimePO animePO = collectionMapper.verifyAnimeExistence(collectDTO.getAnimeName());
+        if (animePO != null) {
+            return Result.success("请勿重复收藏！");
+        }
         int rowsAffected = collectionMapper.insertCollection(collectionPO);
         int rowsAffected1 = collectionMapper.insertRating(ratingPO);
         if (rowsAffected > 0 && rowsAffected1 > 0) {
