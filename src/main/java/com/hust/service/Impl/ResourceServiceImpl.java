@@ -117,6 +117,12 @@ public class ResourceServiceImpl implements ResourceService {
             return Result.error("refreshToken被恶意修改或已经失效!");
 
         }
+/*        try {
+            decodedBytes = Base64.getDecoder().decode(idToken);
+        } catch (RuntimeException exception) {
+            return Result.error("idToken被恶意修改或已经失效!");
+        }
+        String idToken1 = new String(decodedBytes);*/
         try {
             System.out.println("tokenJWE加密: " + idToken);
             String token = decryptJWEToken(idToken);

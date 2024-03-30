@@ -195,6 +195,7 @@ public class AuthorizationController {
                 String name = ((ResourcePO) verify.getData()).getUsername();
                 String email = ((ResourcePO) verify.getData()).getEmail();
                 String idToken = createJWEToken(iss, sub, aud, exp, iat, nonce, picture, nickname, name, email);
+                /*                String base64IdToken = Base64.getEncoder().encodeToString(idToken.getBytes());*/
                 token.put("id_token", idToken);
                 token.put("token_type", "Bearer");
                 token.put("expires_in", 600000);
