@@ -58,6 +58,8 @@ public class UserController {
         }
         if (isCreteUser.getCode() == 1) {
             return Result.success(CREATE_SUCCESS_MESSAGE);
+        } else if (isCreteUser.getData() != null) {
+            return isCreteUser;
         } else {
             return Result.error(CREATE_FAILURE_MESSAGE);
         }

@@ -16,6 +16,8 @@ public interface UserMapper {
     @Select("select * from oidc.mail_code where email = #{email} and code = #{code}")
     Object verifyCode(String email, String code);
 
+    @Select("select * from oidc.user_info where username = #{username}")
+    Object uniqueUser(String username);
 
     /**
      * 创建用户.

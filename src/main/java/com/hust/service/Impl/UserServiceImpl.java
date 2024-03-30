@@ -54,6 +54,10 @@ public class UserServiceImpl implements UserService {
         if (verifyCode == null) {
             return Result.error();
         }
+        Object usernameExistence = userMapper.uniqueUser(userPO.getUsername());
+        if (usernameExistence != null) {
+            return Result.error("该用户名已经被占用！请换一个用户名！");
+        }
         int rowsAffected = userMapper.createUser(userPO);
         if (rowsAffected > 0) {
             return Result.success();
